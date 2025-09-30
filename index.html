@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>₿ Rastreador de Carteira Bitcoin</title>
+    <!-- Favicon com o símbolo Bitcoin em SVG, conforme solicitado -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23F7931A%22>₿</text></svg>">
+    <!-- Carrega o Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* Define a fonte e o fundo principal */
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #1a202c; /* Fundo escuro sutil */
+            color: #e2e8f0; /* Texto claro */
+        }
+        /* Cor tradicional do Bitcoin */
+        .bitcoin-orange {
+            color: #F7931A; 
+        }
+
+        /* Efeito dramático para P&L negativo - Simula o 'sangue' com um forte glow vermelho no hover */
+        .negative-pnl-card.button-card:hover {
+            /* Remove o shadow padrão do Tailwind e aplica o efeito vermelho */
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.7), /* Glow principal */
+                        0 0 50px rgba(255, 0, 0, 0.5); /* Glow secundário mais espalhado */
+            transform: scale(1.02); /* Mantém o efeito de zoom do hover padrão */
+            border-color: #ff4d4d; /* Borda vermelha mais forte */
+        }
+
+        /* Garante que a transição seja suave */
+        .negative-pnl-card {
+            transition: all 0.3s ease-in-out;
+        }
+
+    </style>
+</head>
+<body class="p-4">
+
+    <!-- Container Principal Centrado -->
+    <!-- Adicionando borda laranja: border-2 border-bitcoin-orange -->
+    <div class="w-full max-w-4xl p-6 md:p-10 rounded-xl shadow-2xl bg-gray-900/80 border-2 border-bitcoin-orange">
+        
+        <!-- Cabeçalho com Símbolo Bitcoin -->
+        <header class="text-center mb-8 md:mb-12">
+            <div class="text-7xl md:text-8xl font-black bitcoin-orange leading-none mb-2">
+                ₿
+            </div>
+            <!-- Texto "Resumo da Carteira" removido conforme solicitado -->
+        </header>
+
+        <!-- Grid de Botões (AGORA SEMPRE 2x2: grid-cols-2) -->
+        <div class="grid grid-cols-2 gap-4 md:gap-6">
+            
+            <!-- Botão 1: Saldo em BTC -->
+            <div id="btn-btc-balance" class="button-card">
+                <p class="text-xs sm:text-sm font-medium text-gray-400 mb-1 text-center">Saldo em Carteira</p>
+                <!-- AJUSTE FINAL: text-base (mobile) / sm:text-xl / md:text-4xl (desktop) -->
+                <p id="btc-balance-value" class="text-base sm:text-xl md:text-4xl font-extrabold bitcoin-orange text-center flex-grow flex items-center justify-center">
+                    0.163 BTC
+                </p>
+            </div>
+
+            <!-- Botão 4 (Antigo 4, agora na posição 2): Lucro/Prejuízo (P&L) (Atualizado) -->
+            <!-- Note que a classe 'negative-pnl-card' será adicionada/removida via JS -->
+            <div id="btn-pnl" class="button-card">
+                <p class="text-xs sm:text-sm font-medium text-gray-400 mb-1 text-center">Lucro / Prejuízo (BRL)</p>
+                <!-- AJUSTE FINAL: text-base (mobile) / sm:text-xl / md:text-3xl (desktop) -->
+                <p id="pnl-value" class="text-base sm:text-xl md:text-3xl font-extrabold text-gray-500 text-center flex-grow flex items-center justify-center">
+                    R$ -
+                </p>
+            </div>
+
+            <!-- Botão 3: Saldo em BRL (Atualizado) -->
+            <div id="btn-brl-value" class="button-card">
+                <p class="text-xs sm:text-sm font-medium text-gray-400 mb-1 text-center">Valor em Reais (BRL)</p>
+                <!-- AJUSTE FINAL: text-base (mobile) / sm:text-xl / md:text-3xl (desktop) -->
+                <p id="brl-value" class="text-base sm:text-xl md:text-3xl font-extrabold text-blue-400 text-center flex-grow flex items-center justify-center">
+                    R$ -
+                </p>
+            </div>
+            
+            <!-- Botão 2 (Antigo 2, agora na posição 4): Saldo em USD (Atualizado) -->
+            <div id="btn-usd-value" class="button-card">
+                <p class="text-xs sm:text-sm font-medium text-gray-400 mb-1 text-center">Valor em Dólar (USD)</p>
+                <!-- AJUSTE FINAL: text-base (mobile) / sm:text-xl / md:text-3xl (desktop) -->
+                <p id="usd-value" class="text-base sm:text-xl md:text-3xl font-extrabold text-green-400 text-center flex-grow flex items-center justify-center">
+                    $ -
+                </p>
+            </div>
+
+        </div>
+        
+        <!-- Status e Última Atualização -->
+        <div class="mt-8 text-center text-sm text-gray-500">
+            <p id="last-update">Aguardando a primeira atualização...</p>
+            <p id="status-message" class="text-red-500 mt-2 hidden">Erro ao carregar dados. Tentando novamente...</p>
+        </div>
+
+    </div>
+
+    <script>
+        // Configuração do Tailwind para os estilos dos botões (Componente 'button-card')
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'gray-800-light': '#2d3748', // Um tom um pouco mais claro que o fundo do site (gray-900)
+                        'bitcoin-orange': '#F7931A', // Adicionando a cor BTC ao config do Tailwind
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <script type="module">
+        // Definições de Constantes
+        const WALLET_BALANCE_BTC = 0.163;
+        const INITIAL_INVESTMENT_BRL = 100000;
+        const API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,brl';
+        // Intervalo restaurado para 60 segundos, conforme solicitado
+        const UPDATE_INTERVAL_MS = 60000; 
+        
+        // Elementos da UI
+        const usdValueEl = document.getElementById('usd-value');
+        const brlValueEl = document.getElementById('brl-value');
+        const pnlValueEl = document.getElementById('pnl-value');
+        const lastUpdateEl = document.getElementById('last-update');
+        const statusMessageEl = document.getElementById('status-message');
+        const pnlButtonEl = document.getElementById('btn-pnl'); // Elemento pai do P&L
+
+        
+        // Formato para Moeda BRL
+        const formatterBRL = new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+        // Formato para Moeda USD
+        const formatterUSD = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+
+        /**
+         * Aplica o estilo CSS para os botões (para não usar classes fixas no HTML)
+         */
+        function applyButtonStyles() {
+            const buttons = document.querySelectorAll('.button-card');
+            buttons.forEach(button => {
+                // Classes Tailwind para o design moderno e responsivo
+                // Removido justify-between para melhor centralização vertical forçada abaixo
+                button.className = `
+                    p-3 sm:p-5 md:p-6 rounded-2xl cursor-pointer 
+                    transition duration-200 ease-in-out transform 
+                    hover:scale-[1.02] hover:shadow-xl 
+                    bg-gray-800-light 
+                    shadow-lg 
+                    flex flex-col h-28 sm:h-32 
+                    border border-gray-700/50
+                `;
+            });
+        }
+        
+        /**
+         * Calcula o P&L e atualiza o estilo do botão de acordo (verde/vermelho + efeito negativo)
+         * @param {number} totalValueBRL - O valor total atual da carteira em BRL.
+         */
+        function updatePnL(totalValueBRL) {
+            const profitLoss = totalValueBRL - INITIAL_INVESTMENT_BRL;
+            const isProfit = profitLoss >= 0;
+
+            const formattedPnL = formatterBRL.format(profitLoss);
+
+            // 1. Atualiza o texto
+            pnlValueEl.textContent = formattedPnL;
+
+            // 2. Remove classes antigas e aplica a nova cor
+            pnlValueEl.classList.remove('text-red-500', 'text-green-500', 'text-gray-500');
+            if (isProfit) {
+                pnlValueEl.classList.add('text-green-500'); // Verde para lucro
+            } else {
+                pnlValueEl.classList.add('text-red-500'); // Vermelho para prejuízo
+            }
+
+            // 3. Aplica/remove a classe para o efeito dramático de hover (glow vermelho)
+            if (pnlButtonEl) {
+                if (isProfit) {
+                    pnlButtonEl.classList.remove('negative-pnl-card');
+                } else {
+                    // Adiciona a classe que ativa o box-shadow vermelho no hover (simulando o "sangue")
+                    pnlButtonEl.classList.add('negative-pnl-card');
+                }
+            }
+        }
+        
+        /**
+         * Atualiza todos os elementos da interface com os dados da API.
+         * @param {number} priceUSD - Preço atual do BTC em USD.
+         * @param {number} priceBRL - Preço atual do BTC em BRL.
+         */
+        function updateUI(priceUSD, priceBRL) {
+            // 1. Calcular valores
+            const totalValueUSD = WALLET_BALANCE_BTC * priceUSD;
+            const totalValueBRL = WALLET_BALANCE_BTC * priceBRL;
+
+            // 2. Atualizar Botão USD
+            usdValueEl.textContent = formatterUSD.format(totalValueUSD);
+
+            // 3. Atualizar Botão BRL
+            brlValueEl.textContent = formatterBRL.format(totalValueBRL);
+
+            // 4. Atualizar Lucro/Prejuízo (P&L)
+            updatePnL(totalValueBRL);
+
+            // 5. Atualizar horário da última atualização
+            const now = new Date();
+            lastUpdateEl.textContent = `Última atualização: ${now.toLocaleTimeString('pt-BR')}`;
+            
+            // 6. Esconder mensagem de erro, se houver
+            statusMessageEl.classList.add('hidden');
+        }
+
+        /**
+         * Busca o preço do Bitcoin na API e chama a função de atualização da UI.
+         */
+        async function fetchBitcoinPrice() {
+            try {
+                // Exibe "Carregando..."
+                usdValueEl.textContent = '$ Carregando...';
+                brlValueEl.textContent = 'R$ Carregando...';
+                
+                // Tenta buscar os dados da API
+                const response = await fetch(API_URL);
+                if (!response.ok) {
+                    throw new Error(`Erro HTTP! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                const btcPrices = data.bitcoin;
+                if (!btcPrices || !btcPrices.usd || !btcPrices.brl) {
+                    throw new Error('Estrutura de dados da API inválida.');
+                }
+
+                const priceUSD = btcPrices.usd;
+                const priceBRL = btcPrices.brl;
+                
+                updateUI(priceUSD, priceBRL);
+
+            } catch (error) {
+                console.error("Erro ao buscar dados da API:", error);
+                
+                // Exibir erro na UI e informar o próximo tempo de tentativa
+                statusMessageEl.textContent = `Erro: Não foi possível obter as cotações. Tentando novamente em ${UPDATE_INTERVAL_MS / 1000}s.`;
+                statusMessageEl.classList.remove('hidden');
+
+                // Garante que o usuário veja que os dados não estão prontos
+                usdValueEl.textContent = '$ Falha';
+                brlValueEl.textContent = 'R$ Falha';
+                pnlValueEl.textContent = 'R$ Falha';
+            }
+        }
+
+        // --- Inicialização ---
+        
+        // 1. Aplica o estilo dinâmico dos botões
+        applyButtonStyles();
+        
+        // 2. Faz a primeira chamada para carregar os dados
+        fetchBitcoinPrice();
+
+        // 3. Configura a atualização automática (agora a cada 60 segundos)
+        setInterval(fetchBitcoinPrice, UPDATE_INTERVAL_MS);
+
+    </script>
+</body>
+</html>

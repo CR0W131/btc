@@ -61,10 +61,16 @@
             
             <!-- Botão 1: Saldo em BTC -->
             <div id="btn-btc-balance" class="button-card">
-                <p class="text-xs sm:text-sm font-medium text-gray-400 mb-1 text-center">Saldo em Carteira</p>
-                <!-- AJUSTE FINAL: text-base (mobile) / sm:text-xl / md:text-4xl (desktop) -->
+                <p class="text-xs sm:text-sm font-medium text-gray-400 mb-1 text-center">Saldo</p>
+                
+                <!-- Valor BTC atualizado -->
                 <p id="btc-balance-value" class="text-base sm:text-xl md:text-4xl font-extrabold bitcoin-orange text-center flex-grow flex items-center justify-center">
-                    0.163 BTC
+                    0.13759877 BTC
+                </p>
+
+                <!-- NOVO TEXTO DE CUSTO DE AQUISIÇÃO -->
+                <p class="text-[10px] sm:text-xs font-semibold text-gray-500 mt-1 text-center">
+                    Custo de Aquisição: R$ 87.000,00
                 </p>
             </div>
 
@@ -122,8 +128,10 @@
     
     <script type="module">
         // Definições de Constantes
-        const WALLET_BALANCE_BTC = 0.163;
-        const INITIAL_INVESTMENT_BRL = 100000;
+        // SALDO ATUALIZADO: 0.13759877 BTC
+        const WALLET_BALANCE_BTC = 0.13759877;
+        // CUSTO ATUALIZADO: R$ 87.000,00
+        const INITIAL_INVESTMENT_BRL = 87000;
         const API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,brl';
         // Intervalo restaurado para 60 segundos, conforme solicitado
         const UPDATE_INTERVAL_MS = 60000; 
@@ -286,3 +294,4 @@
     </script>
 </body>
 </html>
+

@@ -50,10 +50,10 @@
         
         <!-- Cabeçalho com Símbolo Bitcoin -->
         <header class="text-center mb-8 md:mb-12">
-            <div class="text-7xl md:text-8xl font-black bitcoin-orange leading-none mb-2">
-                ₿
+            <!-- Div com o símbolo ₿ para garantir que o elemento apareça sem depender da imagem -->
+            <div class="mx-auto w-32 h-32 md:w-40 md:h-40 rounded-full shadow-2xl bg-gray-700/50 flex items-center justify-center border-4 border-bitcoin-orange">
+                <span class="text-7xl md:text-8xl bitcoin-orange font-bold">₿</span>
             </div>
-            <!-- Texto "Resumo da Carteira" removido conforme solicitado -->
         </header>
 
         <!-- Grid de Botões (AGORA SEMPRE 2x2: grid-cols-2) -->
@@ -158,10 +158,13 @@
         const WALLET_BALANCE_BTC = 0.15777947;
         // CUSTO ATUALIZADO: R$ 100.000,00
         const INITIAL_INVESTMENT_BRL = 100000;
+        
+        // API RESTAURADA: CoinGecko com suporte a USD e BRL
         const API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,brl';
+        
         // Intervalo restaurado para 60 segundos, conforme solicitado
         const UPDATE_INTERVAL_MS = 60000; 
-
+        
         // Dados de Transação (LISTA COMPLETA ATUALIZADA)
         const purchaseTransactions = [
             { btc: 0.04104891, date: '29/09/2025', id: '01000011' },
@@ -178,7 +181,7 @@
         const lastUpdateEl = document.getElementById('last-update');
         const statusMessageEl = document.getElementById('status-message');
         const pnlButtonEl = document.getElementById('btn-pnl');
-        const btcBalanceButtonEl = document.getElementById('btn-btc-balance'); // Novo: Botão para abrir modal
+        const btcBalanceButtonEl = document.getElementById('btn-btc-balance'); 
 
         // Elementos do Modal
         const transactionsModal = document.getElementById('transactions-modal');
@@ -371,13 +374,18 @@
                 usdValueEl.textContent = '$ Carregando...';
                 brlValueEl.textContent = 'R$ Carregando...';
                 
+                // Esconder mensagem de erro no início da busca
+                statusMessageEl.classList.add('hidden');
+                
                 // Tenta buscar os dados da API
                 const response = await fetch(API_URL);
+                
                 if (!response.ok) {
                     throw new Error(`Erro HTTP! Status: ${response.status}`);
                 }
                 const data = await response.json();
                 
+                // Lógica de parsing para CoinGecko (bitcoin.usd, bitcoin.brl)
                 const btcPrices = data.bitcoin;
                 if (!btcPrices || !btcPrices.usd || !btcPrices.brl) {
                     throw new Error('Estrutura de dados da API inválida.');
@@ -413,7 +421,7 @@
         // 3. Faz a primeira chamada para carregar os dados
         fetchBitcoinPrice();
 
-        // 4. Configura a atualização automática (agora a cada 60 segundos)
+        // 4. Configura a atualização automática (a cada 60 segundos)
         setInterval(fetchBitcoinPrice, UPDATE_INTERVAL_MS);
 
     </script>

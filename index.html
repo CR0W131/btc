@@ -59,8 +59,8 @@
         <!-- Grid de Botões (AGORA SEMPRE 2x2: grid-cols-2) -->
         <div class="grid grid-cols-2 gap-4 md:gap-6">
             
-            <!-- Botão 1: Saldo em BTC -->
-            <div id="btn-btc-balance" class="button-card">
+            <!-- Botão 1: Saldo em BTC (Agora abre o Modal) -->
+            <div id="btn-btc-balance" class="button-card cursor-pointer">
                 <p class="text-xs sm:text-sm font-medium text-gray-400 mb-1 text-center">Saldo</p>
                 
                 <!-- Valor BTC atualizado -->
@@ -112,6 +112,32 @@
 
     </div>
 
+    <!-- Modal de Transações de Compra (NOVO ELEMENTO) -->
+    <div id="transactions-modal" class="fixed inset-0 bg-gray-900 bg-opacity-80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-2xl border border-bitcoin-orange/50">
+            <h3 class="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">Detalhes das Compras (BTC)</h3>
+            
+            <div id="transaction-list" class="space-y-3 max-h-80 overflow-y-auto pr-2">
+                <!-- Conteúdo gerado pelo JavaScript aqui -->
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-gray-700">
+                <p id="transaction-summary" class="text-sm text-gray-400">
+                    <!-- O resumo é gerado por JS, mas aqui está o placeholder -->
+                    Total das transações listadas: ...
+                </p>
+                <p id="balance-discrepancy-note" class="text-xs text-red-400 mt-1 hidden">
+                    *O total listado não coincide com o saldo da carteira (0.15777947 BTC).
+                </p>
+            </div>
+
+            <button id="close-modal-btn" class="mt-6 w-full py-2 bg-bitcoin-orange text-gray-900 font-bold rounded-lg hover:bg-opacity-90 transition duration-150">
+                Fechar
+            </button>
+        </div>
+    </div>
+    <!-- Fim do Modal -->
+
     <script>
         // Configuração do Tailwind para os estilos dos botões (Componente 'button-card')
         tailwind.config = {
@@ -128,13 +154,22 @@
     
     <script type="module">
         // Definições de Constantes
-        // SALDO ATUALIZADO: 0.15777947 BTC
+        // SALDO ATUALIZADO: 0.15777947 BTC (A soma das transações abaixo)
         const WALLET_BALANCE_BTC = 0.15777947;
         // CUSTO ATUALIZADO: R$ 100.000,00
         const INITIAL_INVESTMENT_BRL = 100000;
         const API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,brl';
         // Intervalo restaurado para 60 segundos, conforme solicitado
         const UPDATE_INTERVAL_MS = 60000; 
+
+        // Dados de Transação (LISTA COMPLETA ATUALIZADA)
+        const purchaseTransactions = [
+            { btc: 0.04104891, date: '29/09/2025', id: '01000011' },
+            { btc: 0.04005861, date: '29/09/2025', id: '01000110' },
+            { btc: 0.01773225, date: '29/09/2025', id: '01000110' }, 
+            { btc: 0.03875900, date: '01/10/2025', id: '01000011' },
+            { btc: 0.02018070, date: '01/10/2025', id: '01000110' }
+        ];
         
         // Elementos da UI
         const usdValueEl = document.getElementById('usd-value');
@@ -142,7 +177,15 @@
         const pnlValueEl = document.getElementById('pnl-value');
         const lastUpdateEl = document.getElementById('last-update');
         const statusMessageEl = document.getElementById('status-message');
-        const pnlButtonEl = document.getElementById('btn-pnl'); // Elemento pai do P&L
+        const pnlButtonEl = document.getElementById('btn-pnl');
+        const btcBalanceButtonEl = document.getElementById('btn-btc-balance'); // Novo: Botão para abrir modal
+
+        // Elementos do Modal
+        const transactionsModal = document.getElementById('transactions-modal');
+        const transactionListEl = document.getElementById('transaction-list');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const transactionSummaryEl = document.getElementById('transaction-summary');
+        const discrepancyNoteEl = document.getElementById('balance-discrepancy-note');
 
         
         // Formato para Moeda BRL
@@ -160,6 +203,13 @@
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
         });
+        
+        // Formato para BTC (8 casas decimais)
+        const formatterBTC = new Intl.NumberFormat('pt-BR', {
+            minimumFractionDigits: 8,
+            maximumFractionDigits: 8
+        });
+
 
         /**
          * Aplica o estilo CSS para os botões (para não usar classes fixas no HTML)
@@ -168,7 +218,6 @@
             const buttons = document.querySelectorAll('.button-card');
             buttons.forEach(button => {
                 // Classes Tailwind para o design moderno e responsivo
-                // Removido justify-between para melhor centralização vertical forçada abaixo
                 button.className = `
                     p-3 sm:p-5 md:p-6 rounded-2xl cursor-pointer 
                     transition duration-200 ease-in-out transform 
@@ -180,6 +229,79 @@
                 `;
             });
         }
+
+        /**
+         * Popula o modal com a lista de transações e calcula a soma.
+         */
+        function populateTransactionModal() {
+            transactionListEl.innerHTML = ''; // Limpa a lista anterior
+            let totalTransactionsBTC = 0;
+
+            // Ordena as transações pela data (mais antiga primeiro)
+            const sortedTransactions = [...purchaseTransactions].sort((a, b) => {
+                // Conversão simples de data DD/MM/AAAA para comparação
+                const dateA = new Date(a.date.split('/').reverse().join('-'));
+                const dateB = new Date(b.date.split('/').reverse().join('-'));
+                return dateA - dateB;
+            });
+
+
+            sortedTransactions.forEach(tx => {
+                totalTransactionsBTC += tx.btc;
+                
+                const txDiv = document.createElement('div');
+                txDiv.className = 'bg-gray-700/50 p-3 rounded-lg flex justify-between items-center';
+                
+                // Formata o valor BTC
+                const btcAmount = formatterBTC.format(tx.btc);
+
+                txDiv.innerHTML = `
+                    <div>
+                        <p class="font-bold bitcoin-orange text-sm sm:text-base">${btcAmount} BTC</p>
+                        <p class="text-xs text-gray-400">ID: ${tx.id || 'N/A'}</p>
+                    </div>
+                    <p class="text-sm text-gray-300">${tx.date}</p>
+                `;
+                transactionListEl.appendChild(txDiv);
+            });
+
+            // 1. Atualiza o Resumo
+            transactionSummaryEl.textContent = `Total das transações listadas: ${formatterBTC.format(totalTransactionsBTC)} BTC`;
+
+            // 2. Verifica e mostra a Discrepância
+            // Compara os totais com uma precisão de 8 casas decimais para evitar erros de ponto flutuante
+            if (totalTransactionsBTC.toFixed(8) !== WALLET_BALANCE_BTC.toFixed(8)) {
+                discrepancyNoteEl.textContent = `*O total listado (${formatterBTC.format(totalTransactionsBTC)} BTC) não coincide com o saldo da carteira (${WALLET_BALANCE_BTC} BTC).`;
+                discrepancyNoteEl.classList.remove('hidden');
+            } else {
+                // Os valores coincidem agora, então a nota fica escondida
+                discrepancyNoteEl.classList.add('hidden');
+            }
+        }
+
+        /**
+         * Configura os eventos de clique para abrir/fechar o modal.
+         */
+        function setupModalListeners() {
+            // Abrir modal ao clicar no botão BTC
+            btcBalanceButtonEl.addEventListener('click', () => {
+                populateTransactionModal();
+                transactionsModal.classList.remove('hidden');
+            });
+
+            // Fechar modal ao clicar no botão 'Fechar'
+            closeModalBtn.addEventListener('click', () => {
+                transactionsModal.classList.add('hidden');
+            });
+
+            // Fechar modal ao clicar fora dele
+            transactionsModal.addEventListener('click', (e) => {
+                if (e.target === transactionsModal) {
+                    transactionsModal.classList.add('hidden');
+                }
+            });
+        }
+
         
         /**
          * Calcula o P&L e atualiza o estilo do botão de acordo (verde/vermelho + efeito negativo)
@@ -284,15 +406,16 @@
         
         // 1. Aplica o estilo dinâmico dos botões
         applyButtonStyles();
+
+        // 2. Configura os listeners do modal
+        setupModalListeners();
         
-        // 2. Faz a primeira chamada para carregar os dados
+        // 3. Faz a primeira chamada para carregar os dados
         fetchBitcoinPrice();
 
-        // 3. Configura a atualização automática (agora a cada 60 segundos)
+        // 4. Configura a atualização automática (agora a cada 60 segundos)
         setInterval(fetchBitcoinPrice, UPDATE_INTERVAL_MS);
 
     </script>
 </body>
 </html>
-
-

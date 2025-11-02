@@ -38,6 +38,31 @@
             border-color: #ff4d4d; /* Borda vermelha mais forte */
         }
 
+        /* --- NOVO EFEITO EXCLUSIVO: BTC CARD GLOW (Laranja Intenso) --- */
+        .btc-card.card-glow:hover {
+            /* Glow laranja forte (usando a cor do usuário: 249, 115, 22) */
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.8),  /* Glow principal */
+                        0 0 50px rgba(249, 115, 22, 0.5);  /* Glow secundário mais difuso */
+            transform: scale(1.02); /* Mantém o efeito de leve zoom */
+            border-color: #f97316; /* Borda laranja mais intensa */
+        }
+        /* --- NOVO EFEITO EXCLUSIVO: BRL CARD GLOW (Azul) --- */
+        .brl-card.card-glow:hover {
+            box-shadow: 0 0 30px rgba(96, 165, 250, 0.8),  /* Glow principal (Blue-400) */
+                        0 0 50px rgba(96, 165, 250, 0.5);  /* Glow secundário mais difuso */
+            transform: scale(1.02);
+            border-color: #60a5fa; /* Borda azul mais intensa */
+        }
+        /* --- NOVO EFEITO EXCLUSIVO: USD CARD GLOW (Verde) --- */
+        .usd-card.card-glow:hover {
+            box-shadow: 0 0 30px rgba(74, 222, 128, 0.8),  /* Glow principal (Green-400) */
+                        0 0 50px rgba(74, 222, 128, 0.5);  /* Glow secundário mais difuso */
+            transform: scale(1.02);
+            border-color: #4ade80; /* Borda verde mais intensa */
+        }
+        /* --- FIM NOVOS EFEITOS EXCLUSIVOS --- */
+
+
         /* Animação para o ícone de carregamento */
         .animate-spin-slow {
             animation: spin 3s linear infinite;
@@ -74,7 +99,7 @@
           100% { left: 125%; }
         }
 
-        /* --- NOVO EFEITO: GLOW E LINHA ANIMADA NAS CARDS DE DADOS (card-glow) --- */
+        /* --- EFEITO BASE: GLOW E LINHA ANIMADA NAS CARDS DE DADOS (card-glow) --- */
         .card-glow {
             position: relative;
             /* Usando 1rem para corresponder ao rounded-2xl do Tailwind */
@@ -91,7 +116,7 @@
 
         .card-glow:hover {
             transform: translateY(-3px);
-            /* Brilho laranja sutil ao passar o mouse */
+            /* Brilho laranja sutil ao passar o mouse - Padrão para P&L positivo */
             box-shadow: 0 6px 16px rgba(247, 147, 26, 0.25);
         }
 
@@ -125,7 +150,7 @@
             0% { transform: translateX(-50%); }
             100% { transform: translateX(50%); }
         }
-        /* --- FIM NOVO EFEITO --- */
+        /* --- FIM EFEITO BASE --- */
 
     </style>
 </head>
@@ -144,10 +169,9 @@
         </header>
 
         <!-- Grid de Botões (AGORA SEMPRE 2x2: grid-cols-2) -->
-        <!-- O efeito 'card-glow' é aplicado via JavaScript na função applyButtonStyles() -->
         <div class="grid grid-cols-2 gap-4 md:gap-6">
             
-            <!-- Botão 1: Saldo em BTC (Agora abre o Modal) -->
+            <!-- Botão 1: Saldo em BTC -->
             <div id="btn-btc-balance" class="button-card cursor-pointer">
                 <!-- ESTRUTURA COM ÍCONE -->
                 <div class="flex justify-between items-center mb-1">
@@ -166,7 +190,7 @@
                 </p>
             </div>
 
-            <!-- Botão 4 (Antigo 4, agora na posição 2): Lucro/Prejuízo (P&L) (Atualizado) -->
+            <!-- Botão 4: Lucro/Prejuízo (P&L) -->
             <div id="btn-pnl" class="button-card">
                 <!-- ESTRUTURA COM ÍCONE (ID para manipulação) -->
                 <div class="flex justify-between items-center mb-1">
@@ -180,7 +204,7 @@
                 </p>
             </div>
 
-            <!-- Botão 3: Saldo em BRL (Atualizado) -->
+            <!-- Botão 3: Saldo em BRL (APLICADA A CLASSE 'brl-card' VIA JS) -->
             <div id="btn-brl-value" class="button-card">
                 <!-- ESTRUTURA COM ÍCONE -->
                 <div class="flex justify-between items-center mb-1">
@@ -193,7 +217,7 @@
                 </p>
             </div>
             
-            <!-- Botão 2 (Antigo 2, agora na posição 4): Saldo em USD (Atualizado) -->
+            <!-- Botão 2: Saldo em USD (APLICADA A CLASSE 'usd-card' VIA JS) -->
             <div id="btn-usd-value" class="button-card">
                 <!-- ESTRUTURA COM ÍCONE -->
                 <div class="flex justify-between items-center mb-1">
@@ -235,7 +259,7 @@
                 </p>
             </div>
 
-            <!-- O botão de fechar agora possui a classe btn-sweep para o efeito -->
+            <!-- O botão de fechar possui a classe btn-sweep para o efeito -->
             <button id="close-modal-btn" class="btn-sweep mt-6 w-full py-2 bg-bitcoin-orange text-gray-900 font-bold rounded-lg transition duration-150 hover:scale-[1.01]">
                 Fechar
             </button>
@@ -326,14 +350,23 @@
         function applyButtonStyles() {
             const buttons = document.querySelectorAll('.button-card');
             buttons.forEach(button => {
-                // Adicionando a classe 'card-glow' para o novo efeito, 
-                // e mantendo as classes Tailwind para layout e responsividade.
-                // O card-glow já define o fundo, a borda e as transições de hover.
+                // Adiciona a classe base de estilo do card (glow, blur, transições)
                 button.className = `
                     card-glow 
                     p-3 sm:p-5 md:p-6 rounded-2xl cursor-pointer 
                     flex flex-col h-28 sm:h-32 
                 `;
+                
+                // Aplica classes específicas para o efeito de hover mais forte
+                if (button.id === 'btn-btc-balance') {
+                    button.classList.add('btc-card');
+                } else if (button.id === 'btn-brl-value') { // NOVO
+                    button.classList.add('brl-card');
+                } else if (button.id === 'btn-usd-value') { // NOVO
+                    button.classList.add('usd-card');
+                }
+                
+                // PNL não precisa de classe especial para lucro, apenas para prejuízo (tratado em updatePnL)
             });
         }
 
@@ -450,8 +483,6 @@
                     // Adiciona a classe que ativa o box-shadow vermelho no hover (simulando o "sangue")
                     pnlButtonEl.classList.add('negative-pnl-card');
                 }
-                // Garante que o card-glow tenha suas transições padrão ativas
-                pnlButtonEl.classList.add('card-glow'); 
             }
         }
         
@@ -560,3 +591,4 @@
     </script>
 </body>
 </html>
+

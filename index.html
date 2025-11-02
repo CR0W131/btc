@@ -29,6 +29,27 @@
             color: #F7931A; 
         }
 
+        /* --- NOVO EFEITO: PULSAÇÃO DO LOGO BTC --- */
+        .pulse-btc {
+            /* Animação de 3 segundos, infinita, alternando entre 0% e 100% */
+            animation: pulse-btc 3s infinite alternate;
+        }
+
+        @keyframes pulse-btc {
+            0% {
+                /* Sombra e borda suaves na cor BTC */
+                box-shadow: 0 0 10px rgba(247, 147, 26, 0.4);
+                border-color: rgba(247, 147, 26, 0.6);
+            }
+            100% {
+                /* Sombra e borda mais fortes no pico da pulsação */
+                box-shadow: 0 0 30px rgba(247, 147, 26, 1), 0 0 50px rgba(247, 147, 26, 0.5);
+                border-color: rgba(247, 147, 26, 1);
+            }
+        }
+        /* --- FIM EFEITO LOGO --- */
+
+
         /* Efeito dramático para P&L negativo - Simula o 'sangue' com um forte glow vermelho no hover */
         .negative-pnl-card.card-glow:hover {
             /* Prioriza o glow vermelho sobre o glow laranja do .card-glow:hover */
@@ -38,7 +59,7 @@
             border-color: #ff4d4d; /* Borda vermelha mais forte */
         }
 
-        /* --- NOVO EFEITO EXCLUSIVO: BTC CARD GLOW (Laranja Intenso) --- */
+        /* --- EFEITOS EXCLUSIVOS NO HOVER (Mantidos) --- */
         .btc-card.card-glow:hover {
             /* Glow laranja forte (usando a cor do usuário: 249, 115, 22) */
             box-shadow: 0 0 30px rgba(249, 115, 22, 0.8),  /* Glow principal */
@@ -46,21 +67,19 @@
             transform: scale(1.02); /* Mantém o efeito de leve zoom */
             border-color: #f97316; /* Borda laranja mais intensa */
         }
-        /* --- NOVO EFEITO EXCLUSIVO: BRL CARD GLOW (Azul) --- */
         .brl-card.card-glow:hover {
             box-shadow: 0 0 30px rgba(96, 165, 250, 0.8),  /* Glow principal (Blue-400) */
                         0 0 50px rgba(96, 165, 250, 0.5);  /* Glow secundário mais difuso */
             transform: scale(1.02);
             border-color: #60a5fa; /* Borda azul mais intensa */
         }
-        /* --- NOVO EFEITO EXCLUSIVO: USD CARD GLOW (Verde) --- */
         .usd-card.card-glow:hover {
             box-shadow: 0 0 30px rgba(74, 222, 128, 0.8),  /* Glow principal (Green-400) */
                         0 0 50px rgba(74, 222, 128, 0.5);  /* Glow secundário mais difuso */
             transform: scale(1.02);
             border-color: #4ade80; /* Borda verde mais intensa */
         }
-        /* --- FIM NOVOS EFEITOS EXCLUSIVOS --- */
+        /* --- FIM EFEITOS HOVER EXCLUSIVOS --- */
 
 
         /* Animação para o ícone de carregamento */
@@ -163,7 +182,8 @@
         <!-- Cabeçalho com Símbolo Bitcoin -->
         <header class="text-center mb-8 md:mb-12">
             <!-- Div com o símbolo ₿ para garantir que o elemento apareça sem depender da imagem -->
-            <div class="mx-auto w-32 h-32 md:w-40 md:h-40 rounded-full shadow-2xl bg-gray-700/50 flex items-center justify-center border-4 border-bitcoin-orange">
+            <!-- CLASSE pulse-btc ADICIONADA AQUI -->
+            <div id="btc-logo-container" class="pulse-btc mx-auto w-32 h-32 md:w-40 md:h-40 rounded-full shadow-2xl bg-gray-700/50 flex items-center justify-center border-4 border-bitcoin-orange">
                 <span class="text-7xl md:text-8xl bitcoin-orange font-bold">₿</span>
             </div>
         </header>
@@ -360,9 +380,9 @@
                 // Aplica classes específicas para o efeito de hover mais forte
                 if (button.id === 'btn-btc-balance') {
                     button.classList.add('btc-card');
-                } else if (button.id === 'btn-brl-value') { // NOVO
+                } else if (button.id === 'btn-brl-value') { 
                     button.classList.add('brl-card');
-                } else if (button.id === 'btn-usd-value') { // NOVO
+                } else if (button.id === 'btn-usd-value') { 
                     button.classList.add('usd-card');
                 }
                 
@@ -591,4 +611,3 @@
     </script>
 </body>
 </html>
-

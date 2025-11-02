@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -9,6 +9,8 @@
     <!-- Carrega o Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- NOVO: Adicionar script do Lucide Icons para os símbolos -->
+    <script src="https://unpkg.com/lucide@latest"></script> 
     <style>
         /* Define a fonte e o fundo principal */
         body {
@@ -18,7 +20,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: #1a202c; /* Fundo escuro sutil */
+            /* Fundo escuro atualizado para #101828 */
+            background-color: #101828; 
             color: #e2e8f0; /* Texto claro */
         }
         /* Cor tradicional do Bitcoin */
@@ -27,18 +30,102 @@
         }
 
         /* Efeito dramático para P&L negativo - Simula o 'sangue' com um forte glow vermelho no hover */
-        .negative-pnl-card.button-card:hover {
-            /* Remove o shadow padrão do Tailwind e aplica o efeito vermelho */
+        .negative-pnl-card.card-glow:hover {
+            /* Prioriza o glow vermelho sobre o glow laranja do .card-glow:hover */
             box-shadow: 0 0 30px rgba(255, 0, 0, 0.7), /* Glow principal */
                         0 0 50px rgba(255, 0, 0, 0.5); /* Glow secundário mais espalhado */
             transform: scale(1.02); /* Mantém o efeito de zoom do hover padrão */
             border-color: #ff4d4d; /* Borda vermelha mais forte */
         }
 
-        /* Garante que a transição seja suave */
-        .negative-pnl-card {
-            transition: all 0.3s ease-in-out;
+        /* Animação para o ícone de carregamento */
+        .animate-spin-slow {
+            animation: spin 3s linear infinite;
         }
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* Efeito de luz varrendo (Sweep Effect) no botão de ação */
+        .btn-sweep {
+          position: relative;
+          overflow: hidden;
+          transition: transform 0.3s ease;
+        }
+        .btn-sweep::before {
+          content: "";
+          position: absolute;
+          top: 0;
+          left: -75%;
+          width: 50%;
+          height: 100%;
+          /* Faixa de luz branca semi-transparente */
+          background: linear-gradient(120deg, transparent, rgba(255,255,255,0.6), transparent);
+          animation: sweep 3s infinite;
+        }
+        @keyframes sweep {
+          0% { left: -75%; }
+          50% { left: 125%; }
+          100% { left: 125%; }
+        }
+
+        /* --- NOVO EFEITO: GLOW E LINHA ANIMADA NAS CARDS DE DADOS (card-glow) --- */
+        .card-glow {
+            position: relative;
+            /* Usando 1rem para corresponder ao rounded-2xl do Tailwind */
+            border-radius: 1rem; 
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            /* Fundo escuro semi-transparente do gray-800 */
+            background: rgba(30, 41, 59, 0.85); 
+            backdrop-filter: blur(6px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            /* Transição combinada para o hover do card */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-glow:hover {
+            transform: translateY(-3px);
+            /* Brilho laranja sutil ao passar o mouse */
+            box-shadow: 0 6px 16px rgba(247, 147, 26, 0.25);
+        }
+
+        /* Linha de brilho animada (Laranja Bitcoin) */
+        .card-glow::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 2px;
+            /* Laranja Bitcoin no gradiente */
+            background: linear-gradient(90deg, transparent, rgba(247, 147, 26, 0.8), transparent); 
+            animation: border-sweep 5s linear infinite;
+            opacity: 0.8;
+        }
+
+        /* Brilho leve no contorno (Laranja Bitcoin) */
+        .card-glow::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            /* Laranja Bitcoin no box-shadow estático */
+            box-shadow: 0 0 20px rgba(247, 147, 26, 0.08); 
+        }
+
+        /* Animação de varredura da linha */
+        @keyframes border-sweep {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(50%); }
+        }
+        /* --- FIM NOVO EFEITO --- */
 
     </style>
 </head>
@@ -57,11 +144,16 @@
         </header>
 
         <!-- Grid de Botões (AGORA SEMPRE 2x2: grid-cols-2) -->
+        <!-- O efeito 'card-glow' é aplicado via JavaScript na função applyButtonStyles() -->
         <div class="grid grid-cols-2 gap-4 md:gap-6">
             
             <!-- Botão 1: Saldo em BTC (Agora abre o Modal) -->
             <div id="btn-btc-balance" class="button-card cursor-pointer">
-                <p class="text-xs sm:text-sm font-medium text-gray-400 mb-1 text-center">Saldo</p>
+                <!-- ESTRUTURA COM ÍCONE -->
+                <div class="flex justify-between items-center mb-1">
+                    <p class="text-xs sm:text-sm font-medium text-gray-400">Saldo</p>
+                    <i data-lucide="wallet" class="w-4 h-4 sm:w-5 sm:h-5 bitcoin-orange"></i>
+                </div>
                 
                 <!-- Valor BTC atualizado -->
                 <p id="btc-balance-value" class="text-base sm:text-xl md:text-4xl font-extrabold bitcoin-orange text-center flex-grow flex items-center justify-center">
@@ -75,9 +167,13 @@
             </div>
 
             <!-- Botão 4 (Antigo 4, agora na posição 2): Lucro/Prejuízo (P&L) (Atualizado) -->
-            <!-- Note que a classe 'negative-pnl-card' será adicionada/removida via JS -->
             <div id="btn-pnl" class="button-card">
-                <p class="text-xs sm:text-sm font-medium text-gray-400 mb-1 text-center">Lucro / Prejuízo (BRL)</p>
+                <!-- ESTRUTURA COM ÍCONE (ID para manipulação) -->
+                <div class="flex justify-between items-center mb-1">
+                    <p class="text-xs sm:text-sm font-medium text-gray-400">Lucro / Prejuízo (BRL)</p>
+                    <!-- Ícone padrão, será alterado e colorido por JS -->
+                    <i id="pnl-icon" data-lucide="trending-up" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+                </div>
                 <!-- AJUSTE FINAL: text-base (mobile) / sm:text-xl / md:text-3xl (desktop) -->
                 <p id="pnl-value" class="text-base sm:text-xl md:text-3xl font-extrabold text-gray-500 text-center flex-grow flex items-center justify-center">
                     R$ -
@@ -86,7 +182,11 @@
 
             <!-- Botão 3: Saldo em BRL (Atualizado) -->
             <div id="btn-brl-value" class="button-card">
-                <p class="text-xs sm:text-sm font-medium text-gray-400 mb-1 text-center">Valor em Reais (BRL)</p>
+                <!-- ESTRUTURA COM ÍCONE -->
+                <div class="flex justify-between items-center mb-1">
+                    <p class="text-xs sm:text-sm font-medium text-gray-400">Valor em Reais (BRL)</p>
+                    <i data-lucide="bar-chart-3" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400"></i>
+                </div>
                 <!-- AJUSTE FINAL: text-base (mobile) / sm:text-xl / md:text-3xl (desktop) -->
                 <p id="brl-value" class="text-base sm:text-xl md:text-3xl font-extrabold text-blue-400 text-center flex-grow flex items-center justify-center">
                     R$ -
@@ -95,7 +195,11 @@
             
             <!-- Botão 2 (Antigo 2, agora na posição 4): Saldo em USD (Atualizado) -->
             <div id="btn-usd-value" class="button-card">
-                <p class="text-xs sm:text-sm font-medium text-gray-400 mb-1 text-center">Valor em Dólar (USD)</p>
+                <!-- ESTRUTURA COM ÍCONE -->
+                <div class="flex justify-between items-center mb-1">
+                    <p class="text-xs sm:text-sm font-medium text-gray-400">Valor em Dólar (USD)</p>
+                    <i data-lucide="dollar-sign" class="w-4 h-4 sm:w-5 sm:h-5 text-green-400"></i>
+                </div>
                 <!-- AJUSTE FINAL: text-base (mobile) / sm:text-xl / md:text-3xl (desktop) -->
                 <p id="usd-value" class="text-base sm:text-xl md:text-3xl font-extrabold text-green-400 text-center flex-grow flex items-center justify-center">
                     $ -
@@ -127,11 +231,12 @@
                     Total das transações listadas: ...
                 </p>
                 <p id="balance-discrepancy-note" class="text-xs text-red-400 mt-1 hidden">
-                    *O total listado não coincide com o saldo da carteira (0.15777947 BTC).
+                    *O total listado (${WALLET_BALANCE_BTC} BTC) não coincide com o saldo da carteira (0.15777947 BTC).
                 </p>
             </div>
 
-            <button id="close-modal-btn" class="mt-6 w-full py-2 bg-bitcoin-orange text-gray-900 font-bold rounded-lg hover:bg-opacity-90 transition duration-150">
+            <!-- O botão de fechar agora possui a classe btn-sweep para o efeito -->
+            <button id="close-modal-btn" class="btn-sweep mt-6 w-full py-2 bg-bitcoin-orange text-gray-900 font-bold rounded-lg transition duration-150 hover:scale-[1.01]">
                 Fechar
             </button>
         </div>
@@ -156,7 +261,7 @@
         // Definições de Constantes
         // SALDO ATUALIZADO: 0.15777947 BTC (A soma das transações abaixo)
         const WALLET_BALANCE_BTC = 0.15777947;
-        // CUSTO ATUALIZADO: R$ 100.000,00
+        // CUSTO REVERTIDO: R$ 100.000,00
         const INITIAL_INVESTMENT_BRL = 100000;
         
         // API RESTAURADA: CoinGecko com suporte a USD e BRL
@@ -182,6 +287,7 @@
         const statusMessageEl = document.getElementById('status-message');
         const pnlButtonEl = document.getElementById('btn-pnl');
         const btcBalanceButtonEl = document.getElementById('btn-btc-balance'); 
+        const pnlIconEl = document.getElementById('pnl-icon'); // Elemento do ícone PNL (Novo)
 
         // Elementos do Modal
         const transactionsModal = document.getElementById('transactions-modal');
@@ -220,15 +326,13 @@
         function applyButtonStyles() {
             const buttons = document.querySelectorAll('.button-card');
             buttons.forEach(button => {
-                // Classes Tailwind para o design moderno e responsivo
+                // Adicionando a classe 'card-glow' para o novo efeito, 
+                // e mantendo as classes Tailwind para layout e responsividade.
+                // O card-glow já define o fundo, a borda e as transições de hover.
                 button.className = `
+                    card-glow 
                     p-3 sm:p-5 md:p-6 rounded-2xl cursor-pointer 
-                    transition duration-200 ease-in-out transform 
-                    hover:scale-[1.02] hover:shadow-xl 
-                    bg-gray-800-light 
-                    shadow-lg 
                     flex flex-col h-28 sm:h-32 
-                    border border-gray-700/50
                 `;
             });
         }
@@ -319,22 +423,35 @@
             // 1. Atualiza o texto
             pnlValueEl.textContent = formattedPnL;
 
-            // 2. Remove classes antigas e aplica a nova cor
+            // 2. Remove todas as classes de cor e a de carregamento, e aplica a nova cor
             pnlValueEl.classList.remove('text-red-500', 'text-green-500', 'text-gray-500');
+            pnlIconEl.classList.remove('text-red-500', 'text-green-500', 'text-gray-500', 'animate-spin-slow'); 
+            
             if (isProfit) {
-                pnlValueEl.classList.add('text-green-500'); // Verde para lucro
+                // Aplicando a cor sólida (sem opacidade)
+                pnlValueEl.classList.add('text-green-500'); 
+                pnlIconEl.classList.add('text-green-500'); 
+                pnlIconEl.setAttribute('data-lucide', 'trending-up');
             } else {
-                pnlValueEl.classList.add('text-red-500'); // Vermelho para prejuízo
+                // Aplicando a cor sólida (sem opacidade)
+                pnlValueEl.classList.add('text-red-500'); 
+                pnlIconEl.classList.add('text-red-500'); 
+                pnlIconEl.setAttribute('data-lucide', 'trending-down');
             }
+            
+            lucide.createIcons(); // Recria o ícone após mudar o data-lucide (necessário para Lucide)
 
             // 3. Aplica/remove a classe para o efeito dramático de hover (glow vermelho)
             if (pnlButtonEl) {
                 if (isProfit) {
+                    // Se for lucro, remove a classe de PNL negativo (que sobrescreve o glow laranja)
                     pnlButtonEl.classList.remove('negative-pnl-card');
                 } else {
                     // Adiciona a classe que ativa o box-shadow vermelho no hover (simulando o "sangue")
                     pnlButtonEl.classList.add('negative-pnl-card');
                 }
+                // Garante que o card-glow tenha suas transições padrão ativas
+                pnlButtonEl.classList.add('card-glow'); 
             }
         }
         
@@ -373,7 +490,14 @@
                 // Exibe "Carregando..."
                 usdValueEl.textContent = '$ Carregando...';
                 brlValueEl.textContent = 'R$ Carregando...';
-                
+                pnlValueEl.textContent = 'R$ Carregando...';
+
+                // NOVO: Define um ícone de carregamento e o anima
+                pnlIconEl.classList.remove('text-red-500', 'text-green-500'); 
+                pnlIconEl.classList.add('text-gray-500', 'animate-spin-slow');
+                pnlIconEl.setAttribute('data-lucide', 'loader-2');
+                lucide.createIcons();
+
                 // Esconder mensagem de erro no início da busca
                 statusMessageEl.classList.add('hidden');
                 
@@ -407,6 +531,12 @@
                 usdValueEl.textContent = '$ Falha';
                 brlValueEl.textContent = 'R$ Falha';
                 pnlValueEl.textContent = 'R$ Falha';
+
+                // Garante que o ícone PNL pare a animação de carregamento e volte ao estado de falha
+                pnlIconEl.classList.remove('animate-spin-slow', 'text-green-500', 'text-red-500');
+                pnlIconEl.classList.add('text-gray-500');
+                pnlIconEl.setAttribute('data-lucide', 'alert-triangle');
+                lucide.createIcons();
             }
         }
 
@@ -415,13 +545,16 @@
         // 1. Aplica o estilo dinâmico dos botões
         applyButtonStyles();
 
-        // 2. Configura os listeners do modal
+        // 2. Inicializa Lucide Icons (IMPORTANTE: para renderizar os ícones estáticos)
+        lucide.createIcons();
+        
+        // 3. Configura os listeners do modal
         setupModalListeners();
         
-        // 3. Faz a primeira chamada para carregar os dados
+        // 4. Faz a primeira chamada para carregar os dados
         fetchBitcoinPrice();
 
-        // 4. Configura a atualização automática (a cada 60 segundos)
+        // 5. Configura a atualização automática (a cada 60 segundos)
         setInterval(fetchBitcoinPrice, UPDATE_INTERVAL_MS);
 
     </script>

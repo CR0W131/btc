@@ -1,9 +1,9 @@
-<!DOCTYPE html><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>₿ Rastreador de Carteira Bitcoin</title>
+    <title>₿ Meu BTC</title>
     <!-- Favicon com o símbolo Bitcoin em SVG, conforme solicitado -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23F7931A%22>₿</text></svg>">
     <!-- Carrega o Tailwind CSS CDN -->
@@ -225,7 +225,8 @@
             </div>
 
             <!-- Botão 3: Saldo em BRL (APLICADA A CLASSE 'brl-card' VIA JS) -->
-            <div id="btn-brl-value" class="button-card">
+            <!-- ESTE BOTÃO AGORA TEM UM LISTENER DE CLIQUE PARA ABRIR O MODAL DE PREÇO MÉDIO -->
+            <div id="btn-brl-value" class="button-card cursor-pointer">
                 <!-- ESTRUTURA COM ÍCONE -->
                 <div class="flex justify-between items-center mb-1">
                     <p class="text-xs sm:text-sm font-medium text-gray-400">Valor em Reais (BRL)</p>
@@ -260,7 +261,7 @@
 
     </div>
 
-    <!-- Modal de Transações de Compra (NOVO ELEMENTO) -->
+    <!-- Modal de Transações de Compra (EXISTENTE) -->
     <div id="transactions-modal" class="fixed inset-0 bg-gray-900 bg-opacity-80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
         <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-2xl border border-bitcoin-orange/50">
             <h3 class="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">Detalhes das Compras (BTC)</h3>
@@ -275,6 +276,7 @@
                     Total das transações listadas: ...
                 </p>
                 <p id="balance-discrepancy-note" class="text-xs text-red-400 mt-1 hidden">
+                    <!-- O texto será atualizado por JS, mas o ID é mantido -->
                     *O total listado (${WALLET_BALANCE_BTC} BTC) não coincide com o saldo da carteira (0.15777947 BTC).
                 </p>
             </div>
@@ -285,7 +287,44 @@
             </button>
         </div>
     </div>
-    <!-- Fim do Modal -->
+    <!-- Fim do Modal de Transações -->
+
+    <!-- NOVO: Modal Personalizado para Exibir o Preço Médio Pago -->
+    <div id="average-price-modal" class="fixed inset-0 bg-gray-900 bg-opacity-80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-gray-800 p-6 rounded-xl w-full max-w-sm shadow-2xl border border-blue-400/50">
+            <h3 class="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2 flex items-center">
+                <i data-lucide="calculator" class="w-5 h-5 mr-2 text-blue-400"></i>
+                Preço Médio de Aquisição (BRL)
+            </h3>
+            
+            <!-- NOVO: LISTAGEM SIMPLIFICADA DO INVESTIMENTO -->
+            <div class="space-y-2 mb-4 text-sm">
+                <!-- Total Investimento -->
+                <p class="flex justify-between text-gray-300">
+                    <span>Total Investimento</span>
+                    <span id="initial-investment-display" class="font-semibold text-white">R$ 0,00</span>
+                </p>
+                <!-- Total BTC -->
+                <p class="flex justify-between text-gray-300">
+                    <span>Total BTC</span>
+                    <span id="btc-balance-display" class="font-semibold text-white">0.00 BTC</span>
+                </p>
+            </div>
+
+            <!-- Valor Principal -->
+            <div class="text-center bg-gray-700/50 p-4 rounded-xl my-4 border border-gray-700">
+                <p class="text-lg text-gray-400">Preço Médio por 1 BTC</p>
+                <p id="average-price-value" class="text-4xl font-extrabold text-blue-400 mt-1">
+                    R$ -
+                </p>
+            </div>
+
+            <button id="close-average-modal-btn" class="btn-sweep mt-4 w-full py-2 bg-blue-600 text-white font-bold rounded-lg transition duration-150 hover:scale-[1.01]">
+                Entendi
+            </button>
+        </div>
+    </div>
+    <!-- Fim do Novo Modal -->
 
     <script>
         // Configuração do Tailwind para os estilos dos botões (Componente 'button-card')
@@ -333,12 +372,19 @@
         const btcBalanceButtonEl = document.getElementById('btn-btc-balance'); 
         const pnlIconEl = document.getElementById('pnl-icon'); // Elemento do ícone PNL (Novo)
 
-        // Elementos do Modal
+        // Elementos do Modal de Transações (EXISTENTE)
         const transactionsModal = document.getElementById('transactions-modal');
         const transactionListEl = document.getElementById('transaction-list');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const transactionSummaryEl = document.getElementById('transaction-summary');
         const discrepancyNoteEl = document.getElementById('balance-discrepancy-note');
+        
+        // Elementos do Novo Modal de Preço Médio (NOVO)
+        const averagePriceModal = document.getElementById('average-price-modal');
+        const closeAverageModalBtn = document.getElementById('close-average-modal-btn');
+        const initialInvestmentDisplayEl = document.getElementById('initial-investment-display');
+        const btcBalanceDisplayEl = document.getElementById('btc-balance-display');
+        const averagePriceValueEl = document.getElementById('average-price-value');
 
         
         // Formato para Moeda BRL
@@ -363,6 +409,19 @@
             maximumFractionDigits: 8
         });
 
+        // Formato do Preço Médio (AJUSTADO: apenas 2 casas decimais)
+        const formatterAverageBRL = new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL',
+            minimumFractionDigits: 2,
+            // AJUSTADO PARA APENAS 2 CASAS DECIMAIS
+            maximumFractionDigits: 2 
+        });
+
+        // 1. CÁLCULO DO PREÇO MÉDIO
+        const averagePriceBRL = INITIAL_INVESTMENT_BRL / WALLET_BALANCE_BTC;
+        const formattedAveragePrice = formatterAverageBRL.format(averagePriceBRL);
+
 
         /**
          * Aplica o estilo CSS para os botões (para não usar classes fixas no HTML)
@@ -373,7 +432,7 @@
                 // Adiciona a classe base de estilo do card (glow, blur, transições)
                 button.className = `
                     card-glow 
-                    p-3 sm:p-5 md:p-6 rounded-2xl cursor-pointer 
+                    p-3 sm:p-5 md:p-6 rounded-2xl 
                     flex flex-col h-28 sm:h-32 
                 `;
                 
@@ -382,6 +441,7 @@
                     button.classList.add('btc-card');
                 } else if (button.id === 'btn-brl-value') { 
                     button.classList.add('brl-card');
+                    button.classList.add('cursor-pointer'); // Adicionado cursor-pointer
                 } else if (button.id === 'btn-usd-value') { 
                     button.classList.add('usd-card');
                 }
@@ -400,8 +460,11 @@
             // Ordena as transações pela data (mais antiga primeiro)
             const sortedTransactions = [...purchaseTransactions].sort((a, b) => {
                 // Conversão simples de data DD/MM/AAAA para comparação
-                const dateA = new Date(a.date.split('/').reverse().join('-'));
-                const dateB = new Date(b.date.split('/').reverse().join('-'));
+                const datePartsA = a.date.split('/');
+                const dateA = new Date(`${datePartsA[2]}-${datePartsA[1]}-${datePartsA[0]}`);
+                const datePartsB = b.date.split('/');
+                const dateB = new Date(`${datePartsB[2]}-${datePartsB[1]}-${datePartsB[0]}`);
+
                 return dateA - dateB;
             });
 
@@ -431,7 +494,7 @@
             // 2. Verifica e mostra a Discrepância
             // Compara os totais com uma precisão de 8 casas decimais para evitar erros de ponto flutuante
             if (totalTransactionsBTC.toFixed(8) !== WALLET_BALANCE_BTC.toFixed(8)) {
-                discrepancyNoteEl.textContent = `*O total listado (${formatterBTC.format(totalTransactionsBTC)} BTC) não coincide com o saldo da carteira (${WALLET_BALANCE_BTC} BTC).`;
+                discrepancyNoteEl.textContent = `*O total listado (${formatterBTC.format(totalTransactionsBTC)} BTC) não coincide com o saldo da carteira (${formatterBTC.format(WALLET_BALANCE_BTC)} BTC).`;
                 discrepancyNoteEl.classList.remove('hidden');
             } else {
                 // Os valores coincidem agora, então a nota fica escondida
@@ -440,24 +503,68 @@
         }
 
         /**
-         * Configura os eventos de clique para abrir/fechar o modal.
+         * Exibe o modal com o preço médio de aquisição. (NOVO)
+         */
+        function showAveragePriceModal() {
+            // 1. Atualiza os textos internos do modal
+            initialInvestmentDisplayEl.textContent = formatterBRL.format(INITIAL_INVESTMENT_BRL);
+            btcBalanceDisplayEl.textContent = formatterBTC.format(WALLET_BALANCE_BTC); // Não precisa de "BTC" pois já está no texto fixo do HTML
+            
+            // O valor do preço médio (averagePriceBRL) é recalculado aqui para garantir que use o novo formato.
+            const currentFormattedAveragePrice = formatterAverageBRL.format(averagePriceBRL);
+            averagePriceValueEl.textContent = currentFormattedAveragePrice;
+            
+            // 2. Torna o modal visível
+            averagePriceModal.classList.remove('hidden');
+            averagePriceModal.classList.add('flex'); // Garante que a classe flex para centralização esteja ativa
+            lucide.createIcons(); // Garante que o ícone 'calculator' seja renderizado
+        }
+
+        /**
+         * Esconde o modal do preço médio de aquisição. (NOVO)
+         */
+        function hideAveragePriceModal() {
+            averagePriceModal.classList.add('hidden');
+            averagePriceModal.classList.remove('flex');
+        }
+
+
+        /**
+         * Configura os eventos de clique para abrir/fechar os modais.
          */
         function setupModalListeners() {
-            // Abrir modal ao clicar no botão BTC
+            // Abrir modal de TRANSAÇÕES ao clicar no botão BTC
             btcBalanceButtonEl.addEventListener('click', () => {
                 populateTransactionModal();
                 transactionsModal.classList.remove('hidden');
+                transactionsModal.classList.add('flex');
             });
 
-            // Fechar modal ao clicar no botão 'Fechar'
+            // Fechar modal de TRANSAÇÕES ao clicar no botão 'Fechar'
             closeModalBtn.addEventListener('click', () => {
                 transactionsModal.classList.add('hidden');
+                transactionsModal.classList.remove('flex');
             });
 
-            // Fechar modal ao clicar fora dele
+            // Fechar modal de TRANSAÇÕES ao clicar fora dele
             transactionsModal.addEventListener('click', (e) => {
                 if (e.target === transactionsModal) {
                     transactionsModal.classList.add('hidden');
+                    transactionsModal.classList.remove('flex');
+                }
+            });
+
+            // NOVO: Abrir modal de PREÇO MÉDIO ao clicar no botão BRL
+            const btnBrlValue = document.getElementById('btn-brl-value');
+            btnBrlValue.addEventListener('click', showAveragePriceModal);
+
+            // NOVO: Fechar modal de PREÇO MÉDIO ao clicar no botão 'Entendi'
+            closeAverageModalBtn.addEventListener('click', hideAveragePriceModal);
+
+            // NOVO: Fechar modal de PREÇO MÉDIO ao clicar fora dele
+            averagePriceModal.addEventListener('click', (e) => {
+                if (e.target === averagePriceModal) {
+                    hideAveragePriceModal();
                 }
             });
         }
@@ -599,7 +706,7 @@
         // 2. Inicializa Lucide Icons (IMPORTANTE: para renderizar os ícones estáticos)
         lucide.createIcons();
         
-        // 3. Configura os listeners do modal
+        // 3. Configura os listeners dos modais (incluindo o novo de Preço Médio)
         setupModalListeners();
         
         // 4. Faz a primeira chamada para carregar os dados

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>₿ Meu BTC</title>
+    <title>₿ MEU BTC</title>
     <!-- Favicon com o símbolo Bitcoin em SVG, conforme solicitado -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23F7931A%22>₿</text></svg>">
     <!-- Carrega o Tailwind CSS CDN -->
@@ -201,11 +201,12 @@
                 
                 <!-- Valor BTC atualizado -->
                 <p id="btc-balance-value" class="text-base sm:text-xl md:text-4xl font-extrabold bitcoin-orange text-center flex-grow flex items-center justify-center">
-                    0.15777947 BTC
+                    0.15872852 BTC
                 </p>
 
                 <!-- NOVO TEXTO DE CUSTO DE AQUISIÇÃO -->
                 <p class="text-[10px] sm:text-xs font-semibold text-gray-500 mt-1 text-center">
+                    <!-- CUSTO DE AQUISIÇÃO ATUALIZADO: R$ 100.000,00 -->
                     Custo de Aquisição: R$ 100.000,00
                 </p>
             </div>
@@ -277,7 +278,7 @@
                 </p>
                 <p id="balance-discrepancy-note" class="text-xs text-red-400 mt-1 hidden">
                     <!-- O texto será atualizado por JS, mas o ID é mantido -->
-                    *O total listado (${WALLET_BALANCE_BTC} BTC) não coincide com o saldo da carteira (0.15777947 BTC).
+                    *O total listado (${WALLET_BALANCE_BTC} BTC) não coincide com o saldo da carteira (0.15872852 BTC).
                 </p>
             </div>
 
@@ -342,10 +343,10 @@
     
     <script type="module">
         // Definições de Constantes
-        // SALDO ATUALIZADO: 0.15777947 BTC (A soma das transações abaixo)
-        const WALLET_BALANCE_BTC = 0.15777947;
-        // CUSTO REVERTIDO: R$ 100.000,00
-        const INITIAL_INVESTMENT_BRL = 100000;
+        // SALDO ATUALIZADO: 0.15872852 BTC (A soma das transações abaixo)
+        const WALLET_BALANCE_BTC = 0.15872852;
+        // CUSTO ATUALIZADO PELO USUÁRIO: R$ 100.000,00
+        const INITIAL_INVESTMENT_BRL = 100000.00; 
         
         // API RESTAURADA: CoinGecko com suporte a USD e BRL
         const API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,brl';
@@ -359,7 +360,9 @@
             { btc: 0.04005861, date: '29/09/2025', id: '01000110' },
             { btc: 0.01773225, date: '29/09/2025', id: '01000110' }, 
             { btc: 0.03875900, date: '01/10/2025', id: '01000011' },
-            { btc: 0.02018070, date: '01/10/2025', id: '01000110' }
+            { btc: 0.02018070, date: '01/10/2025', id: '01000110' },
+            // NOVA TRANSAÇÃO INCLUÍDA: 0.00094905, data: '15/12/2025', id: '01000011'
+            { btc: 0.00094905, date: '15/12/2025', id: '01000011' } 
         ];
         
         // Elementos da UI
@@ -419,6 +422,7 @@
         });
 
         // 1. CÁLCULO DO PREÇO MÉDIO
+        // Recalculado com o novo custo de aquisição (100000.00 BRL)
         const averagePriceBRL = INITIAL_INVESTMENT_BRL / WALLET_BALANCE_BTC;
         const formattedAveragePrice = formatterAverageBRL.format(averagePriceBRL);
 
@@ -575,6 +579,7 @@
          * @param {number} totalValueBRL - O valor total atual da carteira em BRL.
          */
         function updatePnL(totalValueBRL) {
+            // Usa o custo de aquisição corrigido: 100000.00
             const profitLoss = totalValueBRL - INITIAL_INVESTMENT_BRL;
             const isProfit = profitLoss >= 0;
 
@@ -644,58 +649,80 @@
          * Busca o preço do Bitcoin na API e chama a função de atualização da UI.
          */
         async function fetchBitcoinPrice() {
-            try {
-                // Exibe "Carregando..."
-                usdValueEl.textContent = '$ Carregando...';
-                brlValueEl.textContent = 'R$ Carregando...';
-                pnlValueEl.textContent = 'R$ Carregando...';
+            // Implementação de backoff exponencial para lidar com erros de API
+            const maxRetries = 5;
+            let currentRetry = 0;
 
-                // NOVO: Define um ícone de carregamento e o anima
-                pnlIconEl.classList.remove('text-red-500', 'text-green-500'); 
-                pnlIconEl.classList.add('text-gray-500', 'animate-spin-slow');
-                pnlIconEl.setAttribute('data-lucide', 'loader-2');
-                lucide.createIcons();
+            const executeFetch = async () => {
+                 try {
+                    // Exibe "Carregando..."
+                    usdValueEl.textContent = '$ Carregando...';
+                    brlValueEl.textContent = 'R$ Carregando...';
+                    pnlValueEl.textContent = 'R$ Carregando...';
 
-                // Esconder mensagem de erro no início da busca
-                statusMessageEl.classList.add('hidden');
-                
-                // Tenta buscar os dados da API
-                const response = await fetch(API_URL);
-                
-                if (!response.ok) {
-                    throw new Error(`Erro HTTP! Status: ${response.status}`);
+                    // Define um ícone de carregamento e o anima
+                    pnlIconEl.classList.remove('text-red-500', 'text-green-500'); 
+                    pnlIconEl.classList.add('text-gray-500', 'animate-spin-slow');
+                    pnlIconEl.setAttribute('data-lucide', 'loader-2');
+                    lucide.createIcons();
+
+                    // Esconder mensagem de erro no início da busca
+                    statusMessageEl.classList.add('hidden');
+                    
+                    // Tenta buscar os dados da API
+                    const response = await fetch(API_URL);
+                    
+                    if (!response.ok) {
+                        throw new Error(`Erro HTTP! Status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    
+                    // Lógica de parsing para CoinGecko (bitcoin.usd, bitcoin.brl)
+                    const btcPrices = data.bitcoin;
+                    if (!btcPrices || !btcPrices.usd || !btcPrices.brl) {
+                        throw new Error('Estrutura de dados da API inválida.');
+                    }
+
+                    const priceUSD = btcPrices.usd;
+                    const priceBRL = btcPrices.brl;
+                    
+                    updateUI(priceUSD, priceBRL);
+
+                } catch (error) {
+                    console.error("Erro ao buscar dados da API:", error);
+
+                    if (currentRetry < maxRetries) {
+                        currentRetry++;
+                        // Cálculo do delay: 2^retry * 1000ms
+                        const delay = Math.pow(2, currentRetry) * 1000; 
+                        
+                        // Exibe mensagem de erro na UI com o tempo de próxima tentativa
+                        statusMessageEl.textContent = `Erro: Não foi possível obter as cotações. Tentando novamente em ${delay / 1000}s.`;
+                        statusMessageEl.classList.remove('hidden');
+
+                        // Espera o delay antes de tentar novamente
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        await executeFetch(); // Chamada recursiva com backoff
+                    } else {
+                        // Max retries reached, display final failure message
+                        statusMessageEl.textContent = `Erro: Falha na conexão com a API após várias tentativas.`;
+                        statusMessageEl.classList.remove('hidden');
+                        
+                        // Garante que o usuário veja que os dados não estão prontos
+                        usdValueEl.textContent = '$ Falha';
+                        brlValueEl.textContent = 'R$ Falha';
+                        pnlValueEl.textContent = 'R$ Falha';
+
+                        // Garante que o ícone PNL pare a animação de carregamento e volte ao estado de falha
+                        pnlIconEl.classList.remove('animate-spin-slow', 'text-green-500', 'text-red-500');
+                        pnlIconEl.classList.add('text-gray-500');
+                        pnlIconEl.setAttribute('data-lucide', 'alert-triangle');
+                        lucide.createIcons();
+                    }
                 }
-                const data = await response.json();
-                
-                // Lógica de parsing para CoinGecko (bitcoin.usd, bitcoin.brl)
-                const btcPrices = data.bitcoin;
-                if (!btcPrices || !btcPrices.usd || !btcPrices.brl) {
-                    throw new Error('Estrutura de dados da API inválida.');
-                }
-
-                const priceUSD = btcPrices.usd;
-                const priceBRL = btcPrices.brl;
-                
-                updateUI(priceUSD, priceBRL);
-
-            } catch (error) {
-                console.error("Erro ao buscar dados da API:", error);
-                
-                // Exibir erro na UI e informar o próximo tempo de tentativa
-                statusMessageEl.textContent = `Erro: Não foi possível obter as cotações. Tentando novamente em ${UPDATE_INTERVAL_MS / 1000}s.`;
-                statusMessageEl.classList.remove('hidden');
-
-                // Garante que o usuário veja que os dados não estão prontos
-                usdValueEl.textContent = '$ Falha';
-                brlValueEl.textContent = 'R$ Falha';
-                pnlValueEl.textContent = 'R$ Falha';
-
-                // Garante que o ícone PNL pare a animação de carregamento e volte ao estado de falha
-                pnlIconEl.classList.remove('animate-spin-slow', 'text-green-500', 'text-red-500');
-                pnlIconEl.classList.add('text-gray-500');
-                pnlIconEl.setAttribute('data-lucide', 'alert-triangle');
-                lucide.createIcons();
-            }
+            };
+            
+            await executeFetch(); // Inicia a execução com backoff
         }
 
         // --- Inicialização ---

@@ -201,7 +201,7 @@
                 
                 <!-- Valor BTC atualizado -->
                 <p id="btc-balance-value" class="text-base sm:text-xl md:text-4xl font-extrabold bitcoin-orange text-center flex-grow flex items-center justify-center">
-                    0.15872852 BTC
+                    0.15967943 BTC
                 </p>
 
                 <!-- NOVO TEXTO DE CUSTO DE AQUISIÇÃO -->
@@ -278,7 +278,7 @@
                 </p>
                 <p id="balance-discrepancy-note" class="text-xs text-red-400 mt-1 hidden">
                     <!-- O texto será atualizado por JS, mas o ID é mantido -->
-                    *O total listado (${WALLET_BALANCE_BTC} BTC) não coincide com o saldo da carteira (0.15872852 BTC).
+                    *O total listado (${WALLET_BALANCE_BTC} BTC) não coincide com o saldo da carteira (0.15967943 BTC).
                 </p>
             </div>
 
@@ -343,9 +343,9 @@
     
     <script type="module">
         // Definições de Constantes
-        // SALDO ATUALIZADO: 0.15872852 BTC (A soma das transações abaixo)
-        const WALLET_BALANCE_BTC = 0.15872852;
-        // CUSTO ATUALIZADO PELO USUÁRIO: R$ 100.000,00
+        // NOVO SALDO: 0.15872852 + 0.00095091 = 0.15967943 BTC
+        const WALLET_BALANCE_BTC = 0.15967943; 
+        // CUSTO MANTIDO: R$ 100.000,00 (sem custo de aquisição adicional para a nova transação)
         const INITIAL_INVESTMENT_BRL = 100000.00; 
         
         // API RESTAURADA: CoinGecko com suporte a USD e BRL
@@ -361,8 +361,9 @@
             { btc: 0.01773225, date: '29/09/2025', id: '01000110' }, 
             { btc: 0.03875900, date: '01/10/2025', id: '01000011' },
             { btc: 0.02018070, date: '01/10/2025', id: '01000110' },
-            // NOVA TRANSAÇÃO INCLUÍDA: 0.00094905, data: '15/12/2025', id: '01000011'
-            { btc: 0.00094905, date: '15/12/2025', id: '01000011' } 
+            { btc: 0.00094905, date: '15/12/2025', id: '01000011' }, 
+            // NOVA TRANSAÇÃO INCLUÍDA
+            { btc: 0.00095091, date: '15/12/2025', id: '01000110' } 
         ];
         
         // Elementos da UI
@@ -422,7 +423,7 @@
         });
 
         // 1. CÁLCULO DO PREÇO MÉDIO
-        // Recalculado com o novo custo de aquisição (100000.00 BRL)
+        // Recalculado com o novo saldo total
         const averagePriceBRL = INITIAL_INVESTMENT_BRL / WALLET_BALANCE_BTC;
         const formattedAveragePrice = formatterAverageBRL.format(averagePriceBRL);
 

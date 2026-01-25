@@ -4,15 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>₿ MEU BTC</title>
-    <!-- Favicon com o símbolo Bitcoin em SVG, conforme solicitado -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23F7931A%22>₿</text></svg>">
-    <!-- Carrega o Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <!-- NOVO: Adicionar script do Lucide Icons para os símbolos -->
     <script src="https://unpkg.com/lucide@latest"></script> 
     <style>
-        /* Define a fonte e o fundo principal */
         body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
@@ -20,87 +16,38 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            /* Fundo escuro atualizado para #101828 */
             background-color: #101828; 
-            color: #e2e8f0; /* Texto claro */
+            color: #e2e8f0;
         }
-        /* Cor tradicional do Bitcoin */
-        .bitcoin-orange {
-            color: #F7931A; 
-        }
-
-        /* --- NOVO EFEITO: PULSAÇÃO DO LOGO BTC --- */
-        .pulse-btc {
-            /* Animação de 3 segundos, infinita, alternando entre 0% e 100% */
-            animation: pulse-btc 3s infinite alternate;
-        }
-
+        .bitcoin-orange { color: #F7931A; }
+        .pulse-btc { animation: pulse-btc 3s infinite alternate; }
         @keyframes pulse-btc {
-            0% {
-                /* Sombra e borda suaves na cor BTC */
-                box-shadow: 0 0 10px rgba(247, 147, 26, 0.4);
-                border-color: rgba(247, 147, 26, 0.6);
-            }
-            100% {
-                /* Sombra e borda mais fortes no pico da pulsação */
-                box-shadow: 0 0 30px rgba(247, 147, 26, 1), 0 0 50px rgba(247, 147, 26, 0.5);
-                border-color: rgba(247, 147, 26, 1);
-            }
+            0% { box-shadow: 0 0 10px rgba(247, 147, 26, 0.4); border-color: rgba(247, 147, 26, 0.6); }
+            100% { box-shadow: 0 0 30px rgba(247, 147, 26, 1), 0 0 50px rgba(247, 147, 26, 0.5); border-color: rgba(247, 147, 26, 1); }
         }
-        /* --- FIM EFEITO LOGO --- */
-
-
-        /* Efeito dramático para P&L negativo - Simula o 'sangue' com um forte glow vermelho no hover */
         .negative-pnl-card.card-glow:hover {
-            /* Prioriza o glow vermelho sobre o glow laranja do .card-glow:hover */
-            box-shadow: 0 0 30px rgba(255, 0, 0, 0.7), /* Glow principal */
-                        0 0 50px rgba(255, 0, 0, 0.5); /* Glow secundário mais espalhado */
-            transform: scale(1.02); /* Mantém o efeito de zoom do hover padrão */
-            border-color: #ff4d4d; /* Borda vermelha mais forte */
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.7), 0 0 50px rgba(255, 0, 0, 0.5);
+            transform: scale(1.02);
+            border-color: #ff4d4d;
         }
-
-        /* --- EFEITOS EXCLUSIVOS NO HOVER (Mantidos) --- */
         .btc-card.card-glow:hover {
-            /* Glow laranja forte (usando a cor do usuário: 249, 115, 22) */
-            box-shadow: 0 0 30px rgba(249, 115, 22, 0.8),  /* Glow principal */
-                        0 0 50px rgba(249, 115, 22, 0.5);  /* Glow secundário mais difuso */
-            transform: scale(1.02); /* Mantém o efeito de leve zoom */
-            border-color: #f97316; /* Borda laranja mais intensa */
+            box-shadow: 0 0 30px rgba(249, 115, 22, 0.8), 0 0 50px rgba(249, 115, 22, 0.5);
+            transform: scale(1.02);
+            border-color: #f97316;
         }
         .brl-card.card-glow:hover {
-            box-shadow: 0 0 30px rgba(96, 165, 250, 0.8),  /* Glow principal (Blue-400) */
-                        0 0 50px rgba(96, 165, 250, 0.5);  /* Glow secundário mais difuso */
+            box-shadow: 0 0 30px rgba(96, 165, 250, 0.8), 0 0 50px rgba(96, 165, 250, 0.5);
             transform: scale(1.02);
-            border-color: #60a5fa; /* Borda azul mais intensa */
+            border-color: #60a5fa;
         }
         .usd-card.card-glow:hover {
-            box-shadow: 0 0 30px rgba(74, 222, 128, 0.8),  /* Glow principal (Green-400) */
-                        0 0 50px rgba(74, 222, 128, 0.5);  /* Glow secundário mais difuso */
+            box-shadow: 0 0 30px rgba(74, 222, 128, 0.8), 0 0 50px rgba(74, 222, 128, 0.5);
             transform: scale(1.02);
-            border-color: #4ade80; /* Borda verde mais intensa */
+            border-color: #4ade80;
         }
-        /* --- FIM EFEITOS HOVER EXCLUSIVOS --- */
-
-
-        /* Animação para o ícone de carregamento */
-        .animate-spin-slow {
-            animation: spin 3s linear infinite;
-        }
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        
-        /* Efeito de luz varrendo (Sweep Effect) no botão de ação */
-        .btn-sweep {
-          position: relative;
-          overflow: hidden;
-          transition: transform 0.3s ease;
-        }
+        .animate-spin-slow { animation: spin 3s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .btn-sweep { position: relative; overflow: hidden; transition: transform 0.3s ease; }
         .btn-sweep::before {
           content: "";
           position: absolute;
@@ -108,38 +55,21 @@
           left: -75%;
           width: 50%;
           height: 100%;
-          /* Faixa de luz branca semi-transparente */
           background: linear-gradient(120deg, transparent, rgba(255,255,255,0.6), transparent);
           animation: sweep 3s infinite;
         }
-        @keyframes sweep {
-          0% { left: -75%; }
-          50% { left: 125%; }
-          100% { left: 125%; }
-        }
-
-        /* --- EFEITO BASE: GLOW E LINHA ANIMADA NAS CARDS DE DADOS (card-glow) --- */
+        @keyframes sweep { 0% { left: -75%; } 50% { left: 125%; } 100% { left: 125%; } }
         .card-glow {
             position: relative;
-            /* Usando 1rem para corresponder ao rounded-2xl do Tailwind */
             border-radius: 1rem; 
             border: 1px solid rgba(255, 255, 255, 0.08);
-            /* Fundo escuro semi-transparente do gray-800 */
             background: rgba(30, 41, 59, 0.85); 
             backdrop-filter: blur(6px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
             overflow: hidden;
-            /* Transição combinada para o hover do card */
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-
-        .card-glow:hover {
-            transform: translateY(-3px);
-            /* Brilho laranja sutil ao passar o mouse - Padrão para P&L positivo */
-            box-shadow: 0 6px 16px rgba(247, 147, 26, 0.25);
-        }
-
-        /* Linha de brilho animada (Laranja Bitcoin) */
+        .card-glow:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(247, 147, 26, 0.25); }
         .card-glow::before {
             content: '';
             position: absolute;
@@ -147,226 +77,142 @@
             left: -50%;
             width: 200%;
             height: 2px;
-            /* Laranja Bitcoin no gradiente */
             background: linear-gradient(90deg, transparent, rgba(247, 147, 26, 0.8), transparent); 
             animation: border-sweep 5s linear infinite;
             opacity: 0.8;
         }
-
-        /* Brilho leve no contorno (Laranja Bitcoin) */
         .card-glow::after {
             content: '';
             position: absolute;
             inset: 0;
             border-radius: inherit;
             pointer-events: none;
-            /* Laranja Bitcoin no box-shadow estático */
             box-shadow: 0 0 20px rgba(247, 147, 26, 0.08); 
         }
-
-        /* Animação de varredura da linha */
-        @keyframes border-sweep {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(50%); }
-        }
-        /* --- FIM EFEITO BASE --- */
-
+        @keyframes border-sweep { 0% { transform: translateX(-50%); } 100% { transform: translateX(50%); } }
     </style>
 </head>
 <body class="p-4">
-
-    <!-- Container Principal Centrado -->
-    <!-- Adicionando borda laranja: border-2 border-bitcoin-orange -->
     <div class="w-full max-w-4xl p-6 md:p-10 rounded-xl shadow-2xl bg-gray-900/80 border-2 border-bitcoin-orange">
-        
-        <!-- Cabeçalho com Símbolo Bitcoin -->
         <header class="text-center mb-8 md:mb-12">
-            <!-- Div com o símbolo ₿ para garantir que o elemento apareça sem depender da imagem -->
-            <!-- CLASSE pulse-btc ADICIONADA AQUI -->
             <div id="btc-logo-container" class="pulse-btc mx-auto w-32 h-32 md:w-40 md:h-40 rounded-full shadow-2xl bg-gray-700/50 flex items-center justify-center border-4 border-bitcoin-orange">
                 <span class="text-7xl md:text-8xl bitcoin-orange font-bold">₿</span>
             </div>
         </header>
 
-        <!-- Grid de Botões (AGORA SEMPRE 2x2: grid-cols-2) -->
         <div class="grid grid-cols-2 gap-4 md:gap-6">
-            
-            <!-- Botão 1: Saldo em BTC -->
             <div id="btn-btc-balance" class="button-card cursor-pointer">
-                <!-- ESTRUTURA COM ÍCONE -->
                 <div class="flex justify-between items-center mb-1">
                     <p class="text-xs sm:text-sm font-medium text-gray-400">Saldo</p>
                     <i data-lucide="wallet" class="w-4 h-4 sm:w-5 sm:h-5 bitcoin-orange"></i>
                 </div>
-                
-                <!-- Valor BTC atualizado -->
+                <!-- NOVO SALDO TOTAL: 0.16148990 BTC -->
                 <p id="btc-balance-value" class="text-base sm:text-xl md:text-4xl font-extrabold bitcoin-orange text-center flex-grow flex items-center justify-center">
-                    0.15967943 BTC
+                    0.16148990 BTC
                 </p>
-
-                <!-- NOVO TEXTO DE CUSTO DE AQUISIÇÃO -->
                 <p class="text-[10px] sm:text-xs font-semibold text-gray-500 mt-1 text-center">
-                    <!-- CUSTO DE AQUISIÇÃO ATUALIZADO: R$ 100.000,00 -->
                     Custo de Aquisição: R$ 100.000,00
                 </p>
             </div>
 
-            <!-- Botão 4: Lucro/Prejuízo (P&L) -->
             <div id="btn-pnl" class="button-card">
-                <!-- ESTRUTURA COM ÍCONE (ID para manipulação) -->
                 <div class="flex justify-between items-center mb-1">
                     <p class="text-xs sm:text-sm font-medium text-gray-400">Lucro / Prejuízo (BRL)</p>
-                    <!-- Ícone padrão, será alterado e colorido por JS -->
                     <i id="pnl-icon" data-lucide="trending-up" class="w-4 h-4 sm:w-5 sm:h-5"></i>
                 </div>
-                <!-- AJUSTE FINAL: text-base (mobile) / sm:text-xl / md:text-3xl (desktop) -->
                 <p id="pnl-value" class="text-base sm:text-xl md:text-3xl font-extrabold text-gray-500 text-center flex-grow flex items-center justify-center">
                     R$ -
                 </p>
             </div>
 
-            <!-- Botão 3: Saldo em BRL (APLICADA A CLASSE 'brl-card' VIA JS) -->
-            <!-- ESTE BOTÃO AGORA TEM UM LISTENER DE CLIQUE PARA ABRIR O MODAL DE PREÇO MÉDIO -->
             <div id="btn-brl-value" class="button-card cursor-pointer">
-                <!-- ESTRUTURA COM ÍCONE -->
                 <div class="flex justify-between items-center mb-1">
                     <p class="text-xs sm:text-sm font-medium text-gray-400">Valor em Reais (BRL)</p>
                     <i data-lucide="bar-chart-3" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400"></i>
                 </div>
-                <!-- AJUSTE FINAL: text-base (mobile) / sm:text-xl / md:text-3xl (desktop) -->
                 <p id="brl-value" class="text-base sm:text-xl md:text-3xl font-extrabold text-blue-400 text-center flex-grow flex items-center justify-center">
                     R$ -
                 </p>
             </div>
             
-            <!-- Botão 2: Saldo em USD (APLICADA A CLASSE 'usd-card' VIA JS) -->
             <div id="btn-usd-value" class="button-card">
-                <!-- ESTRUTURA COM ÍCONE -->
                 <div class="flex justify-between items-center mb-1">
                     <p class="text-xs sm:text-sm font-medium text-gray-400">Valor em Dólar (USD)</p>
                     <i data-lucide="dollar-sign" class="w-4 h-4 sm:w-5 sm:h-5 text-green-400"></i>
                 </div>
-                <!-- AJUSTE FINAL: text-base (mobile) / sm:text-xl / md:text-3xl (desktop) -->
                 <p id="usd-value" class="text-base sm:text-xl md:text-3xl font-extrabold text-green-400 text-center flex-grow flex items-center justify-center">
                     $ -
                 </p>
             </div>
-
         </div>
         
-        <!-- Status e Última Atualização -->
         <div class="mt-8 text-center text-sm text-gray-500">
             <p id="last-update">Aguardando a primeira atualização...</p>
             <p id="status-message" class="text-red-500 mt-2 hidden">Erro ao carregar dados. Tentando novamente...</p>
         </div>
-
     </div>
 
-    <!-- Modal de Transações de Compra (EXISTENTE) -->
+    <!-- Modal Transações -->
     <div id="transactions-modal" class="fixed inset-0 bg-gray-900 bg-opacity-80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
         <div class="bg-gray-800 p-6 rounded-xl w-full max-w-md shadow-2xl border border-bitcoin-orange/50">
             <h3 class="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2">Detalhes das Compras (BTC)</h3>
-            
-            <div id="transaction-list" class="space-y-3 max-h-80 overflow-y-auto pr-2">
-                <!-- Conteúdo gerado pelo JavaScript aqui -->
-            </div>
-
+            <div id="transaction-list" class="space-y-3 max-h-80 overflow-y-auto pr-2"></div>
             <div class="mt-4 pt-4 border-t border-gray-700">
-                <p id="transaction-summary" class="text-sm text-gray-400">
-                    <!-- O resumo é gerado por JS, mas aqui está o placeholder -->
-                    Total das transações listadas: ...
-                </p>
-                <p id="balance-discrepancy-note" class="text-xs text-red-400 mt-1 hidden">
-                    <!-- O texto será atualizado por JS, mas o ID é mantido -->
-                    *O total listado (${WALLET_BALANCE_BTC} BTC) não coincide com o saldo da carteira (0.15967943 BTC).
-                </p>
+                <p id="transaction-summary" class="text-sm text-gray-400">Total das transações listadas: ...</p>
+                <p id="balance-discrepancy-note" class="text-xs text-red-400 mt-1 hidden"></p>
             </div>
-
-            <!-- O botão de fechar possui a classe btn-sweep para o efeito -->
-            <button id="close-modal-btn" class="btn-sweep mt-6 w-full py-2 bg-bitcoin-orange text-gray-900 font-bold rounded-lg transition duration-150 hover:scale-[1.01]">
-                Fechar
-            </button>
+            <button id="close-modal-btn" class="btn-sweep mt-6 w-full py-2 bg-bitcoin-orange text-gray-900 font-bold rounded-lg transition duration-150 hover:scale-[1.01]">Fechar</button>
         </div>
     </div>
-    <!-- Fim do Modal de Transações -->
 
-    <!-- NOVO: Modal Personalizado para Exibir o Preço Médio Pago -->
+    <!-- Modal Preço Médio -->
     <div id="average-price-modal" class="fixed inset-0 bg-gray-900 bg-opacity-80 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
         <div class="bg-gray-800 p-6 rounded-xl w-full max-w-sm shadow-2xl border border-blue-400/50">
             <h3 class="text-xl font-bold mb-4 text-white border-b border-gray-700 pb-2 flex items-center">
                 <i data-lucide="calculator" class="w-5 h-5 mr-2 text-blue-400"></i>
                 Preço Médio de Aquisição (BRL)
             </h3>
-            
-            <!-- NOVO: LISTAGEM SIMPLIFICADA DO INVESTIMENTO -->
             <div class="space-y-2 mb-4 text-sm">
-                <!-- Total Investimento -->
-                <p class="flex justify-between text-gray-300">
-                    <span>Total Investimento</span>
-                    <span id="initial-investment-display" class="font-semibold text-white">R$ 0,00</span>
-                </p>
-                <!-- Total BTC -->
-                <p class="flex justify-between text-gray-300">
-                    <span>Total BTC</span>
-                    <span id="btc-balance-display" class="font-semibold text-white">0.00 BTC</span>
-                </p>
+                <p class="flex justify-between text-gray-300"><span>Total Investimento</span><span id="initial-investment-display" class="font-semibold text-white">R$ 0,00</span></p>
+                <p class="flex justify-between text-gray-300"><span>Total BTC</span><span id="btc-balance-display" class="font-semibold text-white">0.00 BTC</span></p>
             </div>
-
-            <!-- Valor Principal -->
             <div class="text-center bg-gray-700/50 p-4 rounded-xl my-4 border border-gray-700">
                 <p class="text-lg text-gray-400">Preço Médio por 1 BTC</p>
-                <p id="average-price-value" class="text-4xl font-extrabold text-blue-400 mt-1">
-                    R$ -
-                </p>
+                <p id="average-price-value" class="text-4xl font-extrabold text-blue-400 mt-1">R$ -</p>
             </div>
-
-            <button id="close-average-modal-btn" class="btn-sweep mt-4 w-full py-2 bg-blue-600 text-white font-bold rounded-lg transition duration-150 hover:scale-[1.01]">
-                Entendi
-            </button>
+            <button id="close-average-modal-btn" class="btn-sweep mt-4 w-full py-2 bg-blue-600 text-white font-bold rounded-lg transition duration-150 hover:scale-[1.01]">Entendi</button>
         </div>
     </div>
-    <!-- Fim do Novo Modal -->
 
     <script>
-        // Configuração do Tailwind para os estilos dos botões (Componente 'button-card')
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        'gray-800-light': '#2d3748', // Um tom um pouco mais claro que o fundo do site (gray-900)
-                        'bitcoin-orange': '#F7931A', // Adicionando a cor BTC ao config do Tailwind
-                    }
+                    colors: { 'gray-800-light': '#2d3748', 'bitcoin-orange': '#F7931A' }
                 }
             }
         }
     </script>
     
     <script type="module">
-        // Definições de Constantes
-        // NOVO SALDO: 0.15872852 + 0.00095091 = 0.15967943 BTC
-        const WALLET_BALANCE_BTC = 0.15967943; 
-        // CUSTO MANTIDO: R$ 100.000,00 (sem custo de aquisição adicional para a nova transação)
+        // SALDO ATUALIZADO: 0.15967943 + 0.00095133 + 0.00085914 = 0.16148990 BTC
+        const WALLET_BALANCE_BTC = 0.16148990;
         const INITIAL_INVESTMENT_BRL = 100000.00; 
-        
-        // API RESTAURADA: CoinGecko com suporte a USD e BRL
         const API_URL = 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,brl';
-        
-        // Intervalo restaurado para 60 segundos, conforme solicitado
         const UPDATE_INTERVAL_MS = 60000; 
         
-        // Dados de Transação (LISTA COMPLETA ATUALIZADA)
         const purchaseTransactions = [
+            { btc: 0.00095133, date: '22/01/2016', id: '01000110' }, // NOVA
             { btc: 0.04104891, date: '29/09/2025', id: '01000011' },
             { btc: 0.04005861, date: '29/09/2025', id: '01000110' },
             { btc: 0.01773225, date: '29/09/2025', id: '01000110' }, 
             { btc: 0.03875900, date: '01/10/2025', id: '01000011' },
             { btc: 0.02018070, date: '01/10/2025', id: '01000110' },
             { btc: 0.00094905, date: '15/12/2025', id: '01000011' }, 
-            // NOVA TRANSAÇÃO INCLUÍDA
-            { btc: 0.00095091, date: '15/12/2025', id: '01000110' } 
+            { btc: 0.00095091, date: '15/12/2025', id: '01000110' },
+            { btc: 0.00085914, date: '15/01/2026', id: '01000011' }  // NOVA
         ];
         
-        // Elementos da UI
         const usdValueEl = document.getElementById('usd-value');
         const brlValueEl = document.getElementById('brl-value');
         const pnlValueEl = document.getElementById('pnl-value');
@@ -374,375 +220,117 @@
         const statusMessageEl = document.getElementById('status-message');
         const pnlButtonEl = document.getElementById('btn-pnl');
         const btcBalanceButtonEl = document.getElementById('btn-btc-balance'); 
-        const pnlIconEl = document.getElementById('pnl-icon'); // Elemento do ícone PNL (Novo)
-
-        // Elementos do Modal de Transações (EXISTENTE)
+        const pnlIconEl = document.getElementById('pnl-icon');
         const transactionsModal = document.getElementById('transactions-modal');
         const transactionListEl = document.getElementById('transaction-list');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const transactionSummaryEl = document.getElementById('transaction-summary');
         const discrepancyNoteEl = document.getElementById('balance-discrepancy-note');
-        
-        // Elementos do Novo Modal de Preço Médio (NOVO)
         const averagePriceModal = document.getElementById('average-price-modal');
         const closeAverageModalBtn = document.getElementById('close-average-modal-btn');
         const initialInvestmentDisplayEl = document.getElementById('initial-investment-display');
         const btcBalanceDisplayEl = document.getElementById('btc-balance-display');
         const averagePriceValueEl = document.getElementById('average-price-value');
 
-        
-        // Formato para Moeda BRL
-        const formatterBRL = new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
+        const formatterBRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+        const formatterUSD = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+        const formatterBTC = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 8 });
+        const formatterAverageBRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 });
 
-        // Formato para Moeda USD
-        const formatterUSD = new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'USD',
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
-        
-        // Formato para BTC (8 casas decimais)
-        const formatterBTC = new Intl.NumberFormat('pt-BR', {
-            minimumFractionDigits: 8,
-            maximumFractionDigits: 8
-        });
-
-        // Formato do Preço Médio (AJUSTADO: apenas 2 casas decimais)
-        const formatterAverageBRL = new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-            minimumFractionDigits: 2,
-            // AJUSTADO PARA APENAS 2 CASAS DECIMAIS
-            maximumFractionDigits: 2 
-        });
-
-        // 1. CÁLCULO DO PREÇO MÉDIO
-        // Recalculado com o novo saldo total
         const averagePriceBRL = INITIAL_INVESTMENT_BRL / WALLET_BALANCE_BTC;
-        const formattedAveragePrice = formatterAverageBRL.format(averagePriceBRL);
 
-
-        /**
-         * Aplica o estilo CSS para os botões (para não usar classes fixas no HTML)
-         */
         function applyButtonStyles() {
-            const buttons = document.querySelectorAll('.button-card');
-            buttons.forEach(button => {
-                // Adiciona a classe base de estilo do card (glow, blur, transições)
-                button.className = `
-                    card-glow 
-                    p-3 sm:p-5 md:p-6 rounded-2xl 
-                    flex flex-col h-28 sm:h-32 
-                `;
-                
-                // Aplica classes específicas para o efeito de hover mais forte
-                if (button.id === 'btn-btc-balance') {
-                    button.classList.add('btc-card');
-                } else if (button.id === 'btn-brl-value') { 
-                    button.classList.add('brl-card');
-                    button.classList.add('cursor-pointer'); // Adicionado cursor-pointer
-                } else if (button.id === 'btn-usd-value') { 
-                    button.classList.add('usd-card');
-                }
-                
-                // PNL não precisa de classe especial para lucro, apenas para prejuízo (tratado em updatePnL)
+            document.querySelectorAll('.button-card').forEach(button => {
+                button.className = `card-glow p-3 sm:p-5 md:p-6 rounded-2xl flex flex-col h-28 sm:h-32 `;
+                if (button.id === 'btn-btc-balance') button.classList.add('btc-card');
+                else if (button.id === 'btn-brl-value') button.classList.add('brl-card', 'cursor-pointer');
+                else if (button.id === 'btn-usd-value') button.classList.add('usd-card');
             });
         }
 
-        /**
-         * Popula o modal com a lista de transações e calcula a soma.
-         */
         function populateTransactionModal() {
-            transactionListEl.innerHTML = ''; // Limpa a lista anterior
+            transactionListEl.innerHTML = '';
             let totalTransactionsBTC = 0;
-
-            // Ordena as transações pela data (mais antiga primeiro)
-            const sortedTransactions = [...purchaseTransactions].sort((a, b) => {
-                // Conversão simples de data DD/MM/AAAA para comparação
-                const datePartsA = a.date.split('/');
-                const dateA = new Date(`${datePartsA[2]}-${datePartsA[1]}-${datePartsA[0]}`);
-                const datePartsB = b.date.split('/');
-                const dateB = new Date(`${datePartsB[2]}-${datePartsB[1]}-${datePartsB[0]}`);
-
-                return dateA - dateB;
+            const sorted = [...purchaseTransactions].sort((a, b) => {
+                const dA = a.date.split('/').reverse().join('-');
+                const dB = b.date.split('/').reverse().join('-');
+                return new Date(dA) - new Date(dB);
             });
-
-
-            sortedTransactions.forEach(tx => {
+            sorted.forEach(tx => {
                 totalTransactionsBTC += tx.btc;
-                
                 const txDiv = document.createElement('div');
                 txDiv.className = 'bg-gray-700/50 p-3 rounded-lg flex justify-between items-center';
-                
-                // Formata o valor BTC
-                const btcAmount = formatterBTC.format(tx.btc);
-
-                txDiv.innerHTML = `
-                    <div>
-                        <p class="font-bold bitcoin-orange text-sm sm:text-base">${btcAmount} BTC</p>
-                        <p class="text-xs text-gray-400">ID: ${tx.id || 'N/A'}</p>
-                    </div>
-                    <p class="text-sm text-gray-300">${tx.date}</p>
-                `;
+                txDiv.innerHTML = `<div><p class="font-bold bitcoin-orange text-sm sm:text-base">${formatterBTC.format(tx.btc)} BTC</p><p class="text-xs text-gray-400">ID: ${tx.id}</p></div><p class="text-sm text-gray-300">${tx.date}</p>`;
                 transactionListEl.appendChild(txDiv);
             });
-
-            // 1. Atualiza o Resumo
             transactionSummaryEl.textContent = `Total das transações listadas: ${formatterBTC.format(totalTransactionsBTC)} BTC`;
-
-            // 2. Verifica e mostra a Discrepância
-            // Compara os totais com uma precisão de 8 casas decimais para evitar erros de ponto flutuante
             if (totalTransactionsBTC.toFixed(8) !== WALLET_BALANCE_BTC.toFixed(8)) {
-                discrepancyNoteEl.textContent = `*O total listado (${formatterBTC.format(totalTransactionsBTC)} BTC) não coincide com o saldo da carteira (${formatterBTC.format(WALLET_BALANCE_BTC)} BTC).`;
+                discrepancyNoteEl.textContent = `*Saldo discrepante! Listado: ${formatterBTC.format(totalTransactionsBTC)} | Carteira: ${formatterBTC.format(WALLET_BALANCE_BTC)}`;
                 discrepancyNoteEl.classList.remove('hidden');
-            } else {
-                // Os valores coincidem agora, então a nota fica escondida
-                discrepancyNoteEl.classList.add('hidden');
-            }
+            } else { discrepancyNoteEl.classList.add('hidden'); }
         }
 
-        /**
-         * Exibe o modal com o preço médio de aquisição. (NOVO)
-         */
         function showAveragePriceModal() {
-            // 1. Atualiza os textos internos do modal
             initialInvestmentDisplayEl.textContent = formatterBRL.format(INITIAL_INVESTMENT_BRL);
-            btcBalanceDisplayEl.textContent = formatterBTC.format(WALLET_BALANCE_BTC); // Não precisa de "BTC" pois já está no texto fixo do HTML
-            
-            // O valor do preço médio (averagePriceBRL) é recalculado aqui para garantir que use o novo formato.
-            const currentFormattedAveragePrice = formatterAverageBRL.format(averagePriceBRL);
-            averagePriceValueEl.textContent = currentFormattedAveragePrice;
-            
-            // 2. Torna o modal visível
+            btcBalanceDisplayEl.textContent = formatterBTC.format(WALLET_BALANCE_BTC);
+            averagePriceValueEl.textContent = formatterAverageBRL.format(averagePriceBRL);
             averagePriceModal.classList.remove('hidden');
-            averagePriceModal.classList.add('flex'); // Garante que a classe flex para centralização esteja ativa
-            lucide.createIcons(); // Garante que o ícone 'calculator' seja renderizado
+            averagePriceModal.classList.add('flex');
+            lucide.createIcons();
         }
 
-        /**
-         * Esconde o modal do preço médio de aquisição. (NOVO)
-         */
-        function hideAveragePriceModal() {
-            averagePriceModal.classList.add('hidden');
-            averagePriceModal.classList.remove('flex');
-        }
-
-
-        /**
-         * Configura os eventos de clique para abrir/fechar os modais.
-         */
         function setupModalListeners() {
-            // Abrir modal de TRANSAÇÕES ao clicar no botão BTC
-            btcBalanceButtonEl.addEventListener('click', () => {
-                populateTransactionModal();
-                transactionsModal.classList.remove('hidden');
-                transactionsModal.classList.add('flex');
-            });
-
-            // Fechar modal de TRANSAÇÕES ao clicar no botão 'Fechar'
-            closeModalBtn.addEventListener('click', () => {
-                transactionsModal.classList.add('hidden');
-                transactionsModal.classList.remove('flex');
-            });
-
-            // Fechar modal de TRANSAÇÕES ao clicar fora dele
-            transactionsModal.addEventListener('click', (e) => {
-                if (e.target === transactionsModal) {
-                    transactionsModal.classList.add('hidden');
-                    transactionsModal.classList.remove('flex');
-                }
-            });
-
-            // NOVO: Abrir modal de PREÇO MÉDIO ao clicar no botão BRL
-            const btnBrlValue = document.getElementById('btn-brl-value');
-            btnBrlValue.addEventListener('click', showAveragePriceModal);
-
-            // NOVO: Fechar modal de PREÇO MÉDIO ao clicar no botão 'Entendi'
-            closeAverageModalBtn.addEventListener('click', hideAveragePriceModal);
-
-            // NOVO: Fechar modal de PREÇO MÉDIO ao clicar fora dele
-            averagePriceModal.addEventListener('click', (e) => {
-                if (e.target === averagePriceModal) {
-                    hideAveragePriceModal();
-                }
-            });
+            btcBalanceButtonEl.addEventListener('click', () => { populateTransactionModal(); transactionsModal.classList.replace('hidden', 'flex'); });
+            closeModalBtn.addEventListener('click', () => transactionsModal.classList.replace('flex', 'hidden'));
+            transactionsModal.addEventListener('click', (e) => { if (e.target === transactionsModal) transactionsModal.classList.replace('flex', 'hidden'); });
+            document.getElementById('btn-brl-value').addEventListener('click', showAveragePriceModal);
+            closeAverageModalBtn.addEventListener('click', () => averagePriceModal.classList.replace('flex', 'hidden'));
+            averagePriceModal.addEventListener('click', (e) => { if (e.target === averagePriceModal) averagePriceModal.classList.replace('flex', 'hidden'); });
         }
 
-        
-        /**
-         * Calcula o P&L e atualiza o estilo do botão de acordo (verde/vermelho + efeito negativo)
-         * @param {number} totalValueBRL - O valor total atual da carteira em BRL.
-         */
         function updatePnL(totalValueBRL) {
-            // Usa o custo de aquisição corrigido: 100000.00
             const profitLoss = totalValueBRL - INITIAL_INVESTMENT_BRL;
             const isProfit = profitLoss >= 0;
-
-            const formattedPnL = formatterBRL.format(profitLoss);
-
-            // 1. Atualiza o texto
-            pnlValueEl.textContent = formattedPnL;
-
-            // 2. Remove todas as classes de cor e a de carregamento, e aplica a nova cor
+            pnlValueEl.textContent = formatterBRL.format(profitLoss);
             pnlValueEl.classList.remove('text-red-500', 'text-green-500', 'text-gray-500');
             pnlIconEl.classList.remove('text-red-500', 'text-green-500', 'text-gray-500', 'animate-spin-slow'); 
-            
             if (isProfit) {
-                // Aplicando a cor sólida (sem opacidade)
-                pnlValueEl.classList.add('text-green-500'); 
-                pnlIconEl.classList.add('text-green-500'); 
+                pnlValueEl.classList.add('text-green-500'); pnlIconEl.classList.add('text-green-500'); 
                 pnlIconEl.setAttribute('data-lucide', 'trending-up');
+                pnlButtonEl.classList.remove('negative-pnl-card');
             } else {
-                // Aplicando a cor sólida (sem opacidade)
-                pnlValueEl.classList.add('text-red-500'); 
-                pnlIconEl.classList.add('text-red-500'); 
+                pnlValueEl.classList.add('text-red-500'); pnlIconEl.classList.add('text-red-500'); 
                 pnlIconEl.setAttribute('data-lucide', 'trending-down');
+                pnlButtonEl.classList.add('negative-pnl-card');
             }
-            
-            lucide.createIcons(); // Recria o ícone após mudar o data-lucide (necessário para Lucide)
-
-            // 3. Aplica/remove a classe para o efeito dramático de hover (glow vermelho)
-            if (pnlButtonEl) {
-                if (isProfit) {
-                    // Se for lucro, remove a classe de PNL negativo (que sobrescreve o glow laranja)
-                    pnlButtonEl.classList.remove('negative-pnl-card');
-                } else {
-                    // Adiciona a classe que ativa o box-shadow vermelho no hover (simulando o "sangue")
-                    pnlButtonEl.classList.add('negative-pnl-card');
-                }
-            }
+            lucide.createIcons();
         }
         
-        /**
-         * Atualiza todos os elementos da interface com os dados da API.
-         * @param {number} priceUSD - Preço atual do BTC em USD.
-         * @param {number} priceBRL - Preço atual do BTC em BRL.
-         */
-        function updateUI(priceUSD, priceBRL) {
-            // 1. Calcular valores
-            const totalValueUSD = WALLET_BALANCE_BTC * priceUSD;
-            const totalValueBRL = WALLET_BALANCE_BTC * priceBRL;
-
-            // 2. Atualizar Botão USD
-            usdValueEl.textContent = formatterUSD.format(totalValueUSD);
-
-            // 3. Atualizar Botão BRL
-            brlValueEl.textContent = formatterBRL.format(totalValueBRL);
-
-            // 4. Atualizar Lucro/Prejuízo (P&L)
-            updatePnL(totalValueBRL);
-
-            // 5. Atualizar horário da última atualização
-            const now = new Date();
-            lastUpdateEl.textContent = `Última atualização: ${now.toLocaleTimeString('pt-BR')}`;
-            
-            // 6. Esconder mensagem de erro, se houver
-            statusMessageEl.classList.add('hidden');
-        }
-
-        /**
-         * Busca o preço do Bitcoin na API e chama a função de atualização da UI.
-         */
         async function fetchBitcoinPrice() {
-            // Implementação de backoff exponencial para lidar com erros de API
-            const maxRetries = 5;
-            let currentRetry = 0;
-
-            const executeFetch = async () => {
-                 try {
-                    // Exibe "Carregando..."
-                    usdValueEl.textContent = '$ Carregando...';
-                    brlValueEl.textContent = 'R$ Carregando...';
-                    pnlValueEl.textContent = 'R$ Carregando...';
-
-                    // Define um ícone de carregamento e o anima
-                    pnlIconEl.classList.remove('text-red-500', 'text-green-500'); 
-                    pnlIconEl.classList.add('text-gray-500', 'animate-spin-slow');
-                    pnlIconEl.setAttribute('data-lucide', 'loader-2');
-                    lucide.createIcons();
-
-                    // Esconder mensagem de erro no início da busca
-                    statusMessageEl.classList.add('hidden');
-                    
-                    // Tenta buscar os dados da API
-                    const response = await fetch(API_URL);
-                    
-                    if (!response.ok) {
-                        throw new Error(`Erro HTTP! Status: ${response.status}`);
-                    }
-                    const data = await response.json();
-                    
-                    // Lógica de parsing para CoinGecko (bitcoin.usd, bitcoin.brl)
-                    const btcPrices = data.bitcoin;
-                    if (!btcPrices || !btcPrices.usd || !btcPrices.brl) {
-                        throw new Error('Estrutura de dados da API inválida.');
-                    }
-
-                    const priceUSD = btcPrices.usd;
-                    const priceBRL = btcPrices.brl;
-                    
-                    updateUI(priceUSD, priceBRL);
-
-                } catch (error) {
-                    console.error("Erro ao buscar dados da API:", error);
-
-                    if (currentRetry < maxRetries) {
-                        currentRetry++;
-                        // Cálculo do delay: 2^retry * 1000ms
-                        const delay = Math.pow(2, currentRetry) * 1000; 
-                        
-                        // Exibe mensagem de erro na UI com o tempo de próxima tentativa
-                        statusMessageEl.textContent = `Erro: Não foi possível obter as cotações. Tentando novamente em ${delay / 1000}s.`;
-                        statusMessageEl.classList.remove('hidden');
-
-                        // Espera o delay antes de tentar novamente
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        await executeFetch(); // Chamada recursiva com backoff
-                    } else {
-                        // Max retries reached, display final failure message
-                        statusMessageEl.textContent = `Erro: Falha na conexão com a API após várias tentativas.`;
-                        statusMessageEl.classList.remove('hidden');
-                        
-                        // Garante que o usuário veja que os dados não estão prontos
-                        usdValueEl.textContent = '$ Falha';
-                        brlValueEl.textContent = 'R$ Falha';
-                        pnlValueEl.textContent = 'R$ Falha';
-
-                        // Garante que o ícone PNL pare a animação de carregamento e volte ao estado de falha
-                        pnlIconEl.classList.remove('animate-spin-slow', 'text-green-500', 'text-red-500');
-                        pnlIconEl.classList.add('text-gray-500');
-                        pnlIconEl.setAttribute('data-lucide', 'alert-triangle');
-                        lucide.createIcons();
-                    }
-                }
-            };
-            
-            await executeFetch(); // Inicia a execução com backoff
+            try {
+                pnlIconEl.classList.add('animate-spin-slow');
+                pnlIconEl.setAttribute('data-lucide', 'loader-2');
+                lucide.createIcons();
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error();
+                const data = await response.json();
+                const { usd, brl } = data.bitcoin;
+                usdValueEl.textContent = formatterUSD.format(WALLET_BALANCE_BTC * usd);
+                brlValueEl.textContent = formatterBRL.format(WALLET_BALANCE_BTC * brl);
+                updatePnL(WALLET_BALANCE_BTC * brl);
+                lastUpdateEl.textContent = `Última atualização: ${new Date().toLocaleTimeString('pt-BR')}`;
+                statusMessageEl.classList.add('hidden');
+            } catch (e) {
+                statusMessageEl.classList.remove('hidden');
+                setTimeout(fetchBitcoinPrice, 5000);
+            }
         }
 
-        // --- Inicialização ---
-        
-        // 1. Aplica o estilo dinâmico dos botões
         applyButtonStyles();
-
-        // 2. Inicializa Lucide Icons (IMPORTANTE: para renderizar os ícones estáticos)
         lucide.createIcons();
-        
-        // 3. Configura os listeners dos modais (incluindo o novo de Preço Médio)
         setupModalListeners();
-        
-        // 4. Faz a primeira chamada para carregar os dados
         fetchBitcoinPrice();
-
-        // 5. Configura a atualização automática (a cada 60 segundos)
         setInterval(fetchBitcoinPrice, UPDATE_INTERVAL_MS);
-
     </script>
 </body>
 </html>

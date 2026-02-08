@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>₿ MEU BTC ₿</title>
+    <title>₿ Rastreador de Carteira Bitcoin</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22 fill=%22%23F7931A%22>₿</text></svg>">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -28,7 +28,25 @@
             100% { box-shadow: 0 0 30px rgba(247, 147, 26, 1), 0 0 50px rgba(247, 147, 26, 0.5); border-color: rgba(247, 147, 26, 1); }
         }
         
-        .btn-sweep { position: relative; overflow: hidden; transition: transform 0.2s ease, filter 0.2s ease; }
+        .card-glow {
+            position: relative;
+            border-radius: 1rem; 
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(30, 41, 59, 0.7); 
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-glow:hover { transform: translateY(-5px); }
+
+        /* Cores específicas no hover */
+        .btc-card:hover { border-color: #F7931A; box-shadow: 0 0 20px rgba(247, 147, 26, 0.3); }
+        .pnl-profit-card:hover { border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.3); }
+        .pnl-loss-card:hover { border-color: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+        .brl-card:hover { border-color: #60a5fa; box-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
+        .usd-card:hover { border-color: #4ade80; box-shadow: 0 0 20px rgba(74, 222, 128, 0.3); }
+        
+        .btn-sweep { position: relative; overflow: hidden; transition: all 0.2s ease; }
         .btn-sweep::before {
           content: "";
           position: absolute;
@@ -36,163 +54,173 @@
           left: -75%;
           width: 50%;
           height: 100%;
-          background: linear-gradient(120deg, transparent, rgba(255,255,255,0.4), transparent);
-          animation: sweep 3s infinite;
+          background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+          animation: sweep 4s infinite;
         }
         @keyframes sweep { 0% { left: -75%; } 50% { left: 125%; } 100% { left: 125%; } }
 
-        .card-glow {
-            position: relative;
-            border-radius: 1rem; 
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(30, 41, 59, 0.85); 
-            backdrop-filter: blur(6px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .card-glow:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(247, 147, 26, 0.25); }
-        
-        .negative-pnl-card.card-glow:hover { border-color: #ff4d4d; box-shadow: 0 0 20px rgba(255, 0, 0, 0.3); }
-        .btc-card.card-glow:hover { border-color: #f97316; box-shadow: 0 0 20px rgba(249, 115, 22, 0.3); }
-        .brl-card.card-glow:hover { border-color: #60a5fa; box-shadow: 0 0 20px rgba(96, 165, 250, 0.3); }
-        .usd-card.card-glow:hover { border-color: #4ade80; box-shadow: 0 0 20px rgba(74, 222, 128, 0.3); }
-
-        /* Transações */
         .tx-item {
             transition: all 0.2s ease;
-            border: 1px solid rgba(255,255,255,0.05);
+            border-left: 4px solid transparent;
         }
         .tx-item:hover {
-            background: rgba(247, 147, 26, 0.08);
-            border-color: rgba(247, 147, 26, 0.2);
-            transform: translateX(4px);
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.01);
         }
-        .tx-id-green { border-left: 4px solid #4ade80; }
-        .tx-id-blue { border-left: 4px solid #60a5fa; }
+        .tx-id-green { border-left-color: #4ade80; }
+        .tx-id-blue { border-left-color: #60a5fa; }
 
-        .animate-spin-slow { animation: spin 3s linear infinite; }
+        .animate-spin-slow { animation: spin 2s linear infinite; }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         
-        /* Custom scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(247, 147, 26, 0.3); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(247, 147, 26, 0.2); border-radius: 10px; }
     </style>
 </head>
 <body class="p-4">
-    <div class="w-full max-w-4xl p-6 md:p-10 rounded-xl shadow-2xl bg-gray-900/80 border-2 border-bitcoin-orange">
-        <header class="text-center mb-8 md:mb-12">
-            <div id="btc-logo-container" class="pulse-btc mx-auto w-32 h-32 md:w-40 md:h-40 rounded-full shadow-2xl bg-gray-700/50 flex items-center justify-center border-4 border-bitcoin-orange">
-                <span class="text-7xl md:text-8xl bitcoin-orange font-bold">₿</span>
+    <div class="w-full max-w-4xl p-6 md:p-10 rounded-3xl shadow-2xl bg-gray-900/60 border border-gray-800">
+        <header class="text-center mb-10">
+            <div id="btc-logo-container" class="pulse-btc mx-auto w-32 h-32 rounded-full shadow-2xl bg-gray-800 flex items-center justify-center border-4 border-bitcoin-orange">
+                <span class="text-7xl bitcoin-orange font-bold">₿</span>
             </div>
+            <h1 class="mt-6 text-2xl font-extrabold tracking-tight">Carteira Bitcoin</h1>
         </header>
 
-        <div class="grid grid-cols-2 gap-4 md:gap-6">
-            <div id="btn-btc-balance" class="button-card cursor-pointer">
-                <div class="flex justify-between items-center mb-1">
-                    <p class="text-xs sm:text-sm font-medium text-gray-400 uppercase tracking-wider">Saldo Total</p>
-                    <i data-lucide="wallet" class="w-4 h-4 sm:w-5 sm:h-5 bitcoin-orange"></i>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Saldo Total (Laranja) -->
+            <div id="btn-btc-balance" class="card-glow btc-card p-6 cursor-pointer group">
+                <div class="flex justify-between items-center mb-4">
+                    <p class="text-sm font-semibold text-gray-400">Saldo Total</p>
+                    <i data-lucide="wallet" class="w-5 h-5 bitcoin-orange"></i>
                 </div>
-                <p id="btc-balance-value" class="text-base sm:text-xl md:text-4xl font-extrabold bitcoin-orange text-center flex-grow flex items-center justify-center">
-                    0.17508990 BTC
-                </p>
-                <p class="text-[10px] sm:text-xs font-semibold text-gray-500 mt-1 text-center">
-                    Investimento: R$ 100.000,00
-                </p>
+                <div class="text-center py-2">
+                    <p id="btc-balance-value" class="text-3xl md:text-4xl font-extrabold bitcoin-orange">0.17508990 BTC</p>
+                    <p class="text-xs text-gray-500 mt-2 font-medium">Custo de Aquisição: R$ 100.000,00</p>
+                </div>
             </div>
 
-            <div id="btn-pnl" class="button-card">
-                <div class="flex justify-between items-center mb-1">
-                    <p class="text-xs sm:text-sm font-medium text-gray-400 uppercase tracking-wider">Resultado (BRL)</p>
-                    <i id="pnl-icon" data-lucide="trending-up" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+            <!-- Lucro/Prejuízo (Verde ou Vermelho) -->
+            <div id="btn-pnl" class="card-glow p-6 cursor-pointer">
+                <div class="flex justify-between items-center mb-4">
+                    <p class="text-sm font-semibold text-gray-400">Lucro / Prejuízo (BRL)</p>
+                    <i id="pnl-icon" data-lucide="trending-up" class="w-5 h-5"></i>
                 </div>
-                <p id="pnl-value" class="text-base sm:text-xl md:text-3xl font-extrabold text-gray-500 text-center flex-grow flex items-center justify-center">
-                    R$ -
-                </p>
+                <div class="text-center py-2">
+                    <p id="pnl-value" class="text-3xl md:text-4xl font-extrabold text-gray-500">R$ -</p>
+                </div>
             </div>
 
-            <div id="btn-brl-value" class="button-card cursor-pointer">
-                <div class="flex justify-between items-center mb-1">
-                    <p class="text-xs sm:text-sm font-medium text-gray-400 uppercase tracking-wider">Valor em Reais</p>
-                    <i data-lucide="bar-chart-3" class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400"></i>
+            <!-- Valor Reais (Azul) -->
+            <div id="btn-brl-value" class="card-glow brl-card p-6 cursor-pointer group">
+                <div class="flex justify-between items-center mb-4">
+                    <p class="text-sm font-semibold text-gray-400">Valor em Reais (BRL)</p>
+                    <i data-lucide="bar-chart-3" class="w-5 h-5 text-blue-400"></i>
                 </div>
-                <p id="brl-value" class="text-base sm:text-xl md:text-3xl font-extrabold text-blue-400 text-center flex-grow flex items-center justify-center">
-                    R$ -
-                </p>
+                <div class="text-center py-2">
+                    <p id="brl-value" class="text-3xl md:text-4xl font-extrabold text-blue-400">R$ -</p>
+                </div>
             </div>
             
-            <div id="btn-usd-value" class="button-card">
-                <div class="flex justify-between items-center mb-1">
-                    <p class="text-xs sm:text-sm font-medium text-gray-400 uppercase tracking-wider">Valor em Dólar</p>
-                    <i data-lucide="dollar-sign" class="w-4 h-4 sm:w-5 sm:h-5 text-green-400"></i>
+            <!-- Valor Dólar (Verde) -->
+            <div id="btn-usd-value" class="card-glow usd-card p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <p class="text-sm font-semibold text-gray-400">Valor em Dólar (USD)</p>
+                    <i data-lucide="dollar-sign" class="w-5 h-5 text-green-400"></i>
                 </div>
-                <p id="usd-value" class="text-base sm:text-xl md:text-3xl font-extrabold text-green-400 text-center flex-grow flex items-center justify-center">
-                    $ -
-                </p>
+                <div class="text-center py-2">
+                    <p id="usd-value" class="text-3xl md:text-4xl font-extrabold text-green-400">$ -</p>
+                </div>
             </div>
         </div>
         
-        <div class="mt-8 text-center text-xs text-gray-500 space-y-1">
-            <p id="last-update" class="font-mono uppercase">Aguardando cotação...</p>
-            <p id="status-message" class="text-red-500 hidden">Erro na rede. Tentando reconectar...</p>
+        <div class="mt-10 text-center text-sm text-gray-500">
+            <p id="last-update">Aguardando a primeira atualização...</p>
+            <p id="status-message" class="text-red-500 mt-2 hidden">Erro ao carregar dados. Tentando novamente...</p>
         </div>
     </div>
 
     <!-- Modal Transações -->
-    <div id="transactions-modal" class="fixed inset-0 bg-gray-950 bg-opacity-90 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-gray-900 p-6 rounded-2xl w-full max-w-md shadow-2xl border border-gray-700">
-            <div class="flex justify-between items-center mb-6 border-b border-gray-800 pb-3">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="history" class="w-5 h-5 bitcoin-orange"></i>
-                    <h3 class="text-lg font-bold text-white uppercase tracking-tight">Extrato de Compras</h3>
-                </div>
-                <span class="text-[10px] text-gray-500 font-mono">LIVE_LEDGER_V2</span>
+    <div id="transactions-modal" class="fixed inset-0 bg-gray-950/90 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 p-8 rounded-3xl w-full max-w-md shadow-2xl border border-gray-800">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-extrabold text-white">Detalhes das Compras</h3>
+                <i data-lucide="history" class="w-6 h-6 bitcoin-orange"></i>
             </div>
             
-            <div id="transaction-list" class="space-y-3 max-h-80 overflow-y-auto pr-2 custom-scrollbar"></div>
+            <div id="transaction-list" class="space-y-4 max-h-80 overflow-y-auto pr-2 custom-scrollbar"></div>
             
-            <div class="mt-6 pt-4 border-t border-gray-800">
-                <div class="flex justify-between items-end">
-                    <div>
-                        <p class="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Saldo Acumulado</p>
-                        <p id="transaction-summary" class="text-xl font-black bitcoin-orange">...</p>
-                    </div>
-                    <div class="text-right">
-                        <p id="balance-discrepancy-note" class="text-[10px] text-red-500 font-mono hidden"></p>
-                    </div>
+            <div class="mt-8 pt-6 border-t border-gray-800">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-400 font-medium text-sm">Volume Total:</span>
+                    <span id="transaction-summary" class="text-xl font-bold bitcoin-orange text-right">...</span>
                 </div>
+                <div id="id-breakdown" class="mt-2 space-y-1 text-right"></div>
             </div>
             
-            <!-- CORRIGIDO: Botão agora usa a cor bitcoin-orange de fundo e texto escuro para visibilidade máxima -->
-            <button id="close-modal-btn" class="btn-sweep mt-6 w-full py-4 bg-bitcoin-orange text-gray-950 font-black rounded-xl text-sm uppercase tracking-widest hover:brightness-110 active:scale-[0.98]">
+            <button id="close-modal-btn" class="btn-sweep mt-8 w-full py-4 bg-bitcoin-orange text-gray-900 font-extrabold rounded-2xl shadow-lg shadow-orange-500/20 hover:scale-[1.02] active:scale-[0.98]">
                 FECHAR RELATÓRIO
             </button>
         </div>
     </div>
 
+    <!-- Modal Lucro Detalhado -->
+    <div id="pnl-modal" class="fixed inset-0 bg-gray-950/90 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 p-8 rounded-3xl w-full max-w-sm shadow-2xl border border-gray-800">
+            <div class="flex items-center gap-3 mb-6">
+                <i id="pnl-modal-icon" data-lucide="trending-up" class="w-6 h-6"></i>
+                <h3 class="text-xl font-extrabold text-white">Performance</h3>
+            </div>
+            
+            <div class="space-y-6 mb-8 text-center">
+                <div id="pnl-modal-box" class="p-6 rounded-2xl border border-opacity-20 transition-all">
+                    <p class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-2">Retorno da Posição</p>
+                    <p id="pnl-modal-value" class="text-3xl font-black mb-1">R$ -</p>
+                    <p id="pnl-modal-percent" class="text-xl font-bold italic opacity-90"></p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 text-xs font-medium uppercase tracking-tighter">
+                    <div class="text-left">
+                        <p class="text-gray-500">Investido</p>
+                        <p class="text-white">R$ 100.000,00</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-gray-500">Atual</p>
+                        <p id="pnl-modal-current" class="text-white">R$ -</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="close-pnl-modal-btn" class="w-full py-4 text-white font-extrabold rounded-2xl transition-all shadow-lg">
+                FECHAR DETALHES
+            </button>
+        </div>
+    </div>
+
     <!-- Modal Preço Médio -->
-    <div id="average-price-modal" class="fixed inset-0 bg-gray-950 bg-opacity-90 backdrop-blur-md hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-gray-900 p-6 rounded-2xl w-full max-w-sm shadow-2xl border border-gray-700">
-            <div class="flex items-center gap-2 mb-4 border-b border-gray-800 pb-2">
-                <i data-lucide="calculator" class="w-5 h-5 text-blue-400"></i>
-                <h3 class="text-lg font-bold text-white uppercase tracking-tight">Cálculo de Preço Médio</h3>
+    <div id="average-price-modal" class="fixed inset-0 bg-gray-950/90 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+        <div class="bg-gray-900 p-8 rounded-3xl w-full max-sm shadow-2xl border border-gray-800">
+            <div class="flex items-center gap-3 mb-6">
+                <i data-lucide="calculator" class="w-6 h-6 text-blue-400"></i>
+                <h3 class="text-xl font-extrabold text-white">Preço Médio</h3>
             </div>
-            <div class="space-y-3 mb-6">
-                <div class="bg-gray-800/50 p-3 rounded-lg border border-gray-800">
-                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Total Investido</p>
-                    <p id="initial-investment-display" class="text-lg font-bold text-white">R$ 0,00</p>
+            
+            <div class="space-y-4 mb-8">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-400">Investimento Total</span>
+                    <span id="initial-investment-display" class="font-bold text-white">R$ 100.000,00</span>
                 </div>
-                <div class="bg-gray-800/50 p-3 rounded-lg border border-gray-800">
-                    <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Posição Atual</p>
-                    <p id="btc-balance-display" class="text-lg font-bold text-white">0.00 BTC</p>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-400">Saldo em BTC</span>
+                    <span id="btc-balance-display" class="font-bold text-white">0.17508990 BTC</span>
+                </div>
+                <div class="mt-6 p-6 bg-blue-500/5 rounded-2xl border border-blue-500/10 text-center">
+                    <p class="text-xs text-blue-400 font-bold uppercase tracking-wider mb-2">Preço Médio por BTC</p>
+                    <p id="average-price-value" class="text-3xl font-black text-blue-400">R$ -</p>
                 </div>
             </div>
-            <div class="text-center bg-blue-500/10 p-5 rounded-2xl border border-blue-500/20 mb-6">
-                <p class="text-[10px] text-blue-400 uppercase font-black tracking-widest mb-1">Breakeven / Preço Médio</p>
-                <p id="average-price-value" class="text-3xl font-black text-blue-400">R$ -</p>
-            </div>
-            <button id="close-average-modal-btn" class="btn-sweep w-full py-4 bg-blue-600 text-white font-black rounded-xl text-sm uppercase tracking-widest hover:brightness-110 active:scale-[0.98]">
+            
+            <button id="close-average-modal-btn" class="w-full py-4 bg-blue-600 text-white font-extrabold rounded-2xl hover:bg-blue-500 transition-colors shadow-lg shadow-blue-500/20">
                 ENTENDIDO
             </button>
         </div>
@@ -217,25 +245,36 @@
             { btc: 0.00680000, date: '05/02/2026', id: '01000110' },
             { btc: 0.00680000, date: '05/02/2026', id: '01000011' }
         ];
+
+        let currentBrlValue = 0;
+        let currentProfitLoss = 0;
+        let currentProfitPercent = 0;
         
         const usdValueEl = document.getElementById('usd-value');
         const brlValueEl = document.getElementById('brl-value');
         const pnlValueEl = document.getElementById('pnl-value');
         const lastUpdateEl = document.getElementById('last-update');
         const statusMessageEl = document.getElementById('status-message');
-        const pnlButtonEl = document.getElementById('btn-pnl');
-        const btcBalanceButtonEl = document.getElementById('btn-btc-balance'); 
         const pnlIconEl = document.getElementById('pnl-icon');
+        const pnlButtonEl = document.getElementById('btn-pnl');
+        
         const transactionsModal = document.getElementById('transactions-modal');
         const transactionListEl = document.getElementById('transaction-list');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const transactionSummaryEl = document.getElementById('transaction-summary');
-        const discrepancyNoteEl = document.getElementById('balance-discrepancy-note');
+        const idBreakdownEl = document.getElementById('id-breakdown');
+        
         const averagePriceModal = document.getElementById('average-price-modal');
         const closeAverageModalBtn = document.getElementById('close-average-modal-btn');
-        const initialInvestmentDisplayEl = document.getElementById('initial-investment-display');
-        const btcBalanceDisplayEl = document.getElementById('btc-balance-display');
         const averagePriceValueEl = document.getElementById('average-price-value');
+
+        const pnlModal = document.getElementById('pnl-modal');
+        const closePnlModalBtn = document.getElementById('close-pnl-modal-btn');
+        const pnlModalValueEl = document.getElementById('pnl-modal-value');
+        const pnlModalPercentEl = document.getElementById('pnl-modal-percent');
+        const pnlModalIconEl = document.getElementById('pnl-modal-icon');
+        const pnlModalBoxEl = document.getElementById('pnl-modal-box');
+        const pnlModalCurrentEl = document.getElementById('pnl-modal-current');
 
         const formatterBRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
         const formatterUSD = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
@@ -244,95 +283,119 @@
 
         const averagePriceBRL = INITIAL_INVESTMENT_BRL / WALLET_BALANCE_BTC;
 
-        function applyButtonStyles() {
-            document.querySelectorAll('.button-card').forEach(button => {
-                button.className = `card-glow p-4 md:p-6 flex flex-col h-32 md:h-36 `;
-                if (button.id === 'btn-btc-balance') button.classList.add('btc-card');
-                else if (button.id === 'btn-brl-value') button.classList.add('brl-card', 'cursor-pointer');
-                else if (button.id === 'btn-usd-value') button.classList.add('usd-card');
-            });
-        }
-
         function populateTransactionModal() {
             transactionListEl.innerHTML = '';
             let totalTransactionsBTC = 0;
+            const totalsById = {};
             
             const sorted = [...purchaseTransactions].sort((a, b) => {
                 const [dayA, monthA, yearA] = a.date.split('/');
                 const [dayB, monthB, yearB] = b.date.split('/');
-                return new Date(yearB, monthB - 1, dayB) - new Date(yearA, monthA - 1, dayA); // Recente primeiro
+                return new Date(yearB, monthB - 1, dayB) - new Date(yearA, monthA - 1, dayA);
             });
 
             sorted.forEach(tx => {
                 totalTransactionsBTC += tx.btc;
+                totalsById[tx.id] = (totalsById[tx.id] || 0) + tx.btc;
+
                 const txDiv = document.createElement('div');
                 const idColorClass = tx.id === '01000110' ? 'tx-id-blue' : 'tx-id-green';
                 
-                txDiv.className = `tx-item bg-gray-800/40 p-4 rounded-xl flex justify-between items-center ${idColorClass}`;
+                txDiv.className = `tx-item bg-gray-800/30 p-4 rounded-2xl flex justify-between items-center ${idColorClass}`;
                 txDiv.innerHTML = `
-                    <div class="flex flex-col gap-1">
-                        <span class="text-[9px] text-gray-500 font-mono tracking-widest uppercase">ID: ${tx.id}</span>
-                        <span class="font-black bitcoin-orange text-sm sm:text-lg">${formatterBTC.format(tx.btc)} <small class="text-[10px] opacity-50">BTC</small></span>
+                    <div class="flex flex-col">
+                        <span class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">ID: ${tx.id}</span>
+                        <span class="font-bold text-white text-lg">${formatterBTC.format(tx.btc)} <span class="text-xs bitcoin-orange">BTC</span></span>
                     </div>
                     <div class="text-right">
-                        <p class="text-xs text-white font-bold">${tx.date}</p>
-                        <p class="text-[9px] text-gray-500 uppercase tracking-tighter">Liquidado</p>
+                        <p class="text-xs font-semibold text-gray-300">${tx.date}</p>
+                        <p class="text-[10px] text-gray-500">Compra Confirmada</p>
                     </div>
                 `;
                 transactionListEl.appendChild(txDiv);
             });
 
             transactionSummaryEl.textContent = `${formatterBTC.format(totalTransactionsBTC)} BTC`;
-            
-            if (totalTransactionsBTC.toFixed(8) !== WALLET_BALANCE_BTC.toFixed(8)) {
-                discrepancyNoteEl.textContent = `DIFF: ${(WALLET_BALANCE_BTC - totalTransactionsBTC).toFixed(8)}`;
-                discrepancyNoteEl.classList.remove('hidden');
-            } else { 
-                discrepancyNoteEl.classList.add('hidden'); 
-            }
+            idBreakdownEl.innerHTML = Object.entries(totalsById).map(([id, total]) => `
+                <p class="text-[10px] text-gray-500 font-medium">
+                    ID ${id}: <span class="text-gray-400">${formatterBTC.format(total)} BTC</span>
+                </p>
+            `).join('');
         }
 
-        function showAveragePriceModal() {
-            initialInvestmentDisplayEl.textContent = formatterBRL.format(INITIAL_INVESTMENT_BRL);
-            btcBalanceDisplayEl.textContent = formatterBTC.format(WALLET_BALANCE_BTC) + " BTC";
-            averagePriceValueEl.textContent = formatterAverageBRL.format(averagePriceBRL);
-            averagePriceModal.classList.remove('hidden');
-            averagePriceModal.classList.add('flex');
+        function showPnlModal() {
+            const isProfit = currentProfitLoss >= 0;
+            const colorClass = isProfit ? 'text-green-500' : 'text-red-500';
+            const bgColorClass = isProfit ? 'bg-green-500/10' : 'bg-red-500/10';
+            const borderColorClass = isProfit ? 'border-green-500/20' : 'border-red-500/20';
+            const btnColorClass = isProfit ? 'bg-green-600 hover:bg-green-500' : 'bg-red-600 hover:bg-red-500';
+            const icon = isProfit ? 'trending-up' : 'trending-down';
+
+            pnlModalValueEl.textContent = formatterBRL.format(currentProfitLoss);
+            pnlModalPercentEl.textContent = (isProfit ? '+' : '') + currentProfitPercent.toFixed(2) + '%';
+            pnlModalCurrentEl.textContent = formatterBRL.format(currentBrlValue);
+            
+            pnlModalValueEl.className = `text-3xl font-black mb-1 ${colorClass}`;
+            pnlModalPercentEl.className = `text-xl font-bold italic opacity-90 ${colorClass}`;
+            pnlModalBoxEl.className = `p-6 rounded-2xl border ${borderColorClass} ${bgColorClass} transition-all`;
+            pnlModalIconEl.className = `w-6 h-6 ${colorClass}`;
+            pnlModalIconEl.setAttribute('data-lucide', icon);
+            
+            closePnlModalBtn.className = `w-full py-4 text-white font-extrabold rounded-2xl transition-all shadow-lg ${btnColorClass}`;
+
+            pnlModal.classList.replace('hidden', 'flex');
             lucide.createIcons();
         }
 
         function setupModalListeners() {
-            btcBalanceButtonEl.addEventListener('click', () => { 
+            // Modal BTC/Transactions
+            document.getElementById('btn-btc-balance').addEventListener('click', () => { 
                 populateTransactionModal(); 
-                transactionsModal.classList.remove('hidden');
-                transactionsModal.classList.add('flex'); 
+                transactionsModal.classList.replace('hidden', 'flex'); 
                 lucide.createIcons();
             });
             closeModalBtn.addEventListener('click', () => transactionsModal.classList.replace('flex', 'hidden'));
-            transactionsModal.addEventListener('click', (e) => { if (e.target === transactionsModal) transactionsModal.classList.replace('flex', 'hidden'); });
             
-            document.getElementById('btn-brl-value').addEventListener('click', showAveragePriceModal);
+            // Modal PnL
+            pnlButtonEl.addEventListener('click', showPnlModal);
+            closePnlModalBtn.addEventListener('click', () => pnlModal.classList.replace('flex', 'hidden'));
+
+            // Modal Average Price
+            document.getElementById('btn-brl-value').addEventListener('click', () => {
+                averagePriceValueEl.textContent = formatterAverageBRL.format(averagePriceBRL);
+                averagePriceModal.classList.replace('hidden', 'flex');
+                lucide.createIcons();
+            });
             closeAverageModalBtn.addEventListener('click', () => averagePriceModal.classList.replace('flex', 'hidden'));
-            averagePriceModal.addEventListener('click', (e) => { if (e.target === averagePriceModal) averagePriceModal.classList.replace('flex', 'hidden'); });
+
+            // Close on backdrop
+            [transactionsModal, pnlModal, averagePriceModal].forEach(modal => {
+                modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.replace('flex', 'hidden'); });
+            });
         }
 
         function updatePnL(totalValueBRL) {
-            const profitLoss = totalValueBRL - INITIAL_INVESTMENT_BRL;
-            const isProfit = profitLoss >= 0;
-            pnlValueEl.textContent = (isProfit ? "+" : "") + formatterBRL.format(profitLoss);
+            currentBrlValue = totalValueBRL;
+            currentProfitLoss = totalValueBRL - INITIAL_INVESTMENT_BRL;
+            currentProfitPercent = (currentProfitLoss / INITIAL_INVESTMENT_BRL) * 100;
+
+            const isProfit = currentProfitLoss >= 0;
+            pnlValueEl.textContent = formatterBRL.format(currentProfitLoss);
+            
             pnlValueEl.classList.remove('text-red-500', 'text-green-500', 'text-gray-500');
             pnlIconEl.classList.remove('text-red-500', 'text-green-500', 'text-gray-500', 'animate-spin-slow'); 
+            pnlButtonEl.classList.remove('pnl-profit-card', 'pnl-loss-card');
             
             if (isProfit) {
                 pnlValueEl.classList.add('text-green-500'); 
                 pnlIconEl.classList.add('text-green-500'); 
                 pnlIconEl.setAttribute('data-lucide', 'trending-up');
-                pnlButtonEl.classList.remove('negative-pnl-card');
+                pnlButtonEl.classList.add('pnl-profit-card');
             } else {
                 pnlValueEl.classList.add('text-red-500'); 
                 pnlIconEl.classList.add('text-red-500'); 
                 pnlIconEl.setAttribute('data-lucide', 'trending-down');
-                pnlButtonEl.classList.add('negative-pnl-card');
+                pnlButtonEl.classList.add('pnl-loss-card');
             }
             lucide.createIcons();
         }
@@ -340,7 +403,7 @@
         async function fetchBitcoinPrice() {
             try {
                 pnlIconEl.classList.add('animate-spin-slow');
-                pnlIconEl.setAttribute('data-lucide', 'loader-2');
+                pnlIconEl.setAttribute('data-lucide', 'refresh-cw');
                 lucide.createIcons();
                 
                 const response = await fetch(API_URL);
@@ -352,7 +415,7 @@
                 brlValueEl.textContent = formatterBRL.format(WALLET_BALANCE_BTC * brl);
                 updatePnL(WALLET_BALANCE_BTC * brl);
                 
-                lastUpdateEl.textContent = `SYNC: ${new Date().toLocaleTimeString('pt-BR')}`;
+                lastUpdateEl.textContent = `Última atualização: ${new Date().toLocaleTimeString('pt-BR')}`;
                 statusMessageEl.classList.add('hidden');
             } catch (e) {
                 statusMessageEl.classList.remove('hidden');
@@ -360,7 +423,6 @@
             }
         }
 
-        applyButtonStyles();
         lucide.createIcons();
         setupModalListeners();
         fetchBitcoinPrice();
